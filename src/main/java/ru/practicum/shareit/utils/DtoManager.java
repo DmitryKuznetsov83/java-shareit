@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 public class DtoManager {
 
+	private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
 	public static <T> T patch(T dto, Map<String, String> patchMap) {
 
 		List<Field> fieldsAsList = List.of(dto.getClass().getDeclaredFields());
@@ -46,7 +48,7 @@ public class DtoManager {
 	}
 
 	public static <T> void validate(T dto) {
-		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
 		Set<ConstraintViolation<T>> violations = validator.validate(dto);
 		if (!violations.isEmpty()) {
 			throw new ConstraintViolationException(violations);
