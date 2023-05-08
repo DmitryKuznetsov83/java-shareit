@@ -30,7 +30,7 @@ public class ItemController {
 
 	@PostMapping
 	public ItemDto postItem(@Valid @RequestBody ItemDto itemDto,
-	                        @RequestHeader(value = "X-Sharer-User-Id", required = true) Integer ownerId) {
+	                        @RequestHeader(value = "X-Sharer-User-Id") Integer ownerId) {
 		if (itemDto.getId() != null) {
 			throw new IncorrectIdException("Item ID must be empty");
 		}
@@ -42,7 +42,7 @@ public class ItemController {
 	@PatchMapping("/{itemId}")
 	public ItemDto patchItem(@PathVariable Integer itemId,
 	                         @RequestBody @NotNull Map<String, String> body,
-	                         @RequestHeader(value = "X-Sharer-User-Id", required = true) Integer ownerId) {
+	                         @RequestHeader(value = "X-Sharer-User-Id") Integer ownerId) {
 
 		// get old item
 		ItemDto itemDto = getItemById(itemId);
@@ -70,7 +70,7 @@ public class ItemController {
 	}
 
 	@GetMapping
-	public List<ItemDto> getItems(@RequestHeader(value = "X-Sharer-User-Id", required = true) Integer ownerId) {
+	public List<ItemDto> getItems(@RequestHeader(value = "X-Sharer-User-Id") Integer ownerId) {
 		return itemService
 				.getItems(ownerId)
 				.stream()
@@ -79,7 +79,7 @@ public class ItemController {
 	}
 
 	@GetMapping("/search")
-	public List<ItemDto> searchItems(@RequestParam(required = true) String text) {
+	public List<ItemDto> searchItems(@RequestParam String text) {
 		if (text.isBlank()) {
 			return Collections.emptyList();
 		}

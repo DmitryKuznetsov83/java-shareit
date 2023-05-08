@@ -17,7 +17,7 @@ public class ResourceNotFoundException extends RuntimeException {
 
 		super(resourceNameId.entrySet()
 				.stream()
-				.map(e -> "" + e.getKey() + " with id " + e.getValue() + " not found")
+				.map(e -> e.getKey() + " with id " + e.getValue() + " not found")
 				.collect(Collectors.joining(", ")));
 
 	}

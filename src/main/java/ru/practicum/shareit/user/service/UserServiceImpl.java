@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User deleteUserById(int userId) {
+	public void deleteUserById(int userId) {
 		// checking
 		User user = userRepository.getUser(userId);
 		if (user == null) {
@@ -38,7 +38,6 @@ public class UserServiceImpl implements UserService {
 
 		// delete
 		userRepository.deleteUserById(userId);
-		return user;
 	}
 
 	@Override

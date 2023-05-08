@@ -41,7 +41,7 @@ public class ItemInMemoryRepository implements ItemRepository{
 
 	@Override
 	public List<Item> getItems(String searchText) {
-		return new ArrayList<>(idItem.values()
+		return idItem.values()
 				.stream()
 				.filter(item -> {
 					String searchLowerCase = searchText.toLowerCase();
@@ -51,15 +51,15 @@ public class ItemInMemoryRepository implements ItemRepository{
 							&& (nameLowerCase.contains(searchLowerCase)
 							|| descriptionLowerCase.contains(searchLowerCase));
 				})
-				.collect(Collectors.toList()));
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<Item> getItems(Integer ownerId) {
-		return new ArrayList<>(idItem.values()
+		return idItem.values()
 				.stream()
 				.filter(item->ownerId.equals(item.getOwner().getId()))
-				.collect(Collectors.toList()));
+				.collect(Collectors.toList());
 	}
 
 	@Override

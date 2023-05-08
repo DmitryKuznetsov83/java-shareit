@@ -23,8 +23,7 @@ public class ItemServiceImpl implements ItemService {
 	public Item addItem(Item item, Integer ownerId) {
 		User owner = userService.getUserById(ownerId);
 		item.setOwner(owner);
-		Item savedItem = itemRepository.addItem(item);
-		return savedItem;
+		return itemRepository.addItem(item);
 	}
 
 	@Override
@@ -36,12 +35,11 @@ public class ItemServiceImpl implements ItemService {
 		} else {
 			throw new UnauthorizedItemChangeException("You can't change item with id " + item.getId());
 		}
-		Item savedItem = itemRepository.updateItem(item);
-		return savedItem;
+		return itemRepository.updateItem(item);
 	}
 
 	@Override
-	public Item deleteItemById(Integer itemId) {
+	public void deleteItemById(Integer itemId) {
 		// checking
 		Item item = itemRepository.getItem(itemId);
 		if (item == null) {
@@ -50,7 +48,6 @@ public class ItemServiceImpl implements ItemService {
 
 		// delete
 		itemRepository.deleteItemById(itemId);
-		return item;
 	}
 
 	@Override
