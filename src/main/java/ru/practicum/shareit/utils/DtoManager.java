@@ -14,9 +14,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static javax.validation.Validation.buildDefaultValidatorFactory;
+
 public class DtoManager {
 
-	private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+	private final static Validator validator = buildDefaultValidatorFactory().getValidator();
 
 	public static <T> T patch(T dto, Map<String, String> patchMap) {
 
