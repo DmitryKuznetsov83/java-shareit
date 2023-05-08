@@ -17,7 +17,7 @@ import static javax.validation.Validation.buildDefaultValidatorFactory;
 
 public class DtoManager {
 
-	private final static Validator validator = buildDefaultValidatorFactory().getValidator();
+	private static final Validator validator = buildDefaultValidatorFactory().getValidator();
 
 	public static <T> T patch(T dto, Map<String, String> patchMap) {
 

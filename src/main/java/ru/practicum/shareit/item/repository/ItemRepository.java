@@ -17,6 +17,6 @@ public interface ItemRepository {
 
 	List<Item> getItems(Integer ownerId);
 
-	void deleteItemById(Integer ItemId);
+	void deleteItemById(Integer itemId);
 
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
-public class ItemInMemoryRepository implements ItemRepository{
+public class ItemInMemoryRepository implements ItemRepository {
 
 	private Integer itemId = 0;
 	private final Map<Integer, Item> idItem = new HashMap<>();
@@ -57,7 +57,7 @@ public class ItemInMemoryRepository implements ItemRepository{
 	public List<Item> getItems(Integer ownerId) {
 		return idItem.values()
 				.stream()
-				.filter(item->ownerId.equals(item.getOwner().getId()))
+				.filter(item -> ownerId.equals(item.getOwner().getId()))
 				.collect(Collectors.toList());
 	}
 
