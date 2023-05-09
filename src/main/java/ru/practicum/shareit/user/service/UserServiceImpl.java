@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.EmailLoginAlreadyUsed;
+import ru.practicum.shareit.exception.EmailNameAlreadyUsedException;
 import ru.practicum.shareit.exception.ResourceNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
 				warningList.add("Login: " + login + " is already used");
 			}
 			String warning = String.join(", ", warningList);
-			throw new EmailLoginAlreadyUsed(warning);
+			throw new EmailNameAlreadyUsedException(warning);
 		}
 	}
 

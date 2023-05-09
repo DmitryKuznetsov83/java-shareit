@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exception.EmailLoginAlreadyUsed;
-import ru.practicum.shareit.exception.ErrorResponse;
+import ru.practicum.shareit.exception.EmailNameAlreadyUsedException;
+import ru.practicum.shareit.aop.ErrorResponse;
 import ru.practicum.shareit.exception.IncorrectIdException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -75,7 +75,7 @@ public class UserController {
 				.collect(Collectors.toList());
 	}
 
-	@ExceptionHandler({EmailLoginAlreadyUsed.class})
+	@ExceptionHandler({EmailNameAlreadyUsedException.class})
 	@ResponseStatus(HttpStatus.CONFLICT)
 	public ErrorResponse handleEmailLoginAlreadyUsed(final RuntimeException e) {
 		return new ErrorResponse(HttpStatus.CONFLICT, "Conflict operation", e.getMessage());

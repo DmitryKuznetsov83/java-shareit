@@ -29,7 +29,7 @@ public class ItemInMemoryRepository implements ItemRepository {
 		if (oldItem == null) {
 			return null;
 		}
-		idItem.put(item.getId(), item);
+		idItem.put(itemId, item);
 		return item;
 	}
 
@@ -63,10 +63,6 @@ public class ItemInMemoryRepository implements ItemRepository {
 
 	@Override
 	public void deleteItemById(Integer itemId) {
-		Item item = idItem.get(itemId);
-		if (item == null) {
-			return;
-		}
 		idItem.remove(itemId);
 	}
 

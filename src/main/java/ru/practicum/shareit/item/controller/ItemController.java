@@ -5,7 +5,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exception.ErrorResponse;
+import ru.practicum.shareit.aop.ErrorResponse;
 import ru.practicum.shareit.exception.IncorrectIdException;
 import ru.practicum.shareit.exception.UnauthorizedItemChangeException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -28,9 +28,11 @@ public class ItemController {
 	private final ItemService itemService;
 	private final ModelMapper modelMapper = new ModelMapper();
 
+	private static final String USER_HEADER = "X-Sharer-User-Id";
+
 	@PostMapping
 	public ItemDto postItem(@Valid @RequestBody ItemDto itemDto,
-	                        @RequestHeader(value = "X-Sharer-User-Id") Integer ownerId) {
+	                        @RequestHeader(USER_HEADER) Integer ownerId) {
 		if (itemDto.getId() != null) {
 			throw new IncorrectIdException("Item ID must be empty");
 		}
@@ -42,7 +44,7 @@ public class ItemController {
 	@PatchMapping("/{itemId}")
 	public ItemDto patchItem(@PathVariable Integer itemId,
 	                         @RequestBody @NotNull Map<String, String> body,
-	                         @RequestHeader(value = "X-Sharer-User-Id") Integer ownerId) {
+	                         @RequestHeader(USER_HEADER) Integer ownerId) {
 
 		// get old item
 		ItemDto itemDto = getItemById(itemId);
@@ -70,7 +72,7 @@ public class ItemController {
 	}
 
 	@GetMapping
-	public List<ItemDto> getItems(@RequestHeader(value = "X-Sharer-User-Id") Integer ownerId) {
+	public List<ItemDto> getItems(@RequestHeader(USER_HEADER) Integer ownerId) {
 		return itemService
 				.getItems(ownerId)
 				.stream()
