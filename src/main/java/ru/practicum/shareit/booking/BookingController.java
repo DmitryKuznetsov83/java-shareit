@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.aop.ErrorResponse;
-import ru.practicum.shareit.booking.dto.BookingCreationDto;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.enums.BookingState;
 import ru.practicum.shareit.booking.exception.IncorrectStatusChangeException;
 import ru.practicum.shareit.booking.exception.ResourceNotAvailableException;
@@ -31,33 +31,33 @@ public class BookingController {
 
 	@PostMapping
 	@Validated
-	public BookingDto postBooking(@Valid @RequestBody BookingCreationDto bookingCreationDto,
-	                              @RequestHeader(USER_HEADER) @Positive Integer bookerId) {
-		return bookService.addBooking(bookingCreationDto, bookerId);
+	public BookingResponseDto postBooking(@Valid @RequestBody BookingRequestDto bookingRequestDto,
+	                                      @RequestHeader(USER_HEADER) @Positive Integer bookerId) {
+		return bookService.addBooking(bookingRequestDto, bookerId);
 	}
 
 	@PatchMapping("/{bookingId}")
-	public BookingDto approveBooking(@PathVariable @Positive Integer bookingId,
-	                                 @RequestHeader(USER_HEADER) @Positive Integer ownerId,
-	                                 @RequestParam boolean approved) {
+	public BookingResponseDto approveBooking(@PathVariable @Positive Integer bookingId,
+	                                         @RequestHeader(USER_HEADER) @Positive Integer ownerId,
+	                                         @RequestParam boolean approved) {
 		return bookService.approveBooking(bookingId, ownerId, approved);
 	}
 
 	@GetMapping("/{bookingId}")
-	public BookingDto getBooking(@PathVariable @Positive Integer bookingId,
-	                             @RequestHeader(USER_HEADER) @Positive Integer userId) {
+	public BookingResponseDto getBooking(@PathVariable @Positive Integer bookingId,
+	                                     @RequestHeader(USER_HEADER) @Positive Integer userId) {
 		return bookService.getBookingById(bookingId, userId);
 	}
 
 	@GetMapping()
-	public List<BookingDto> getBookersBookings(@RequestParam(required = false, defaultValue = "ALL") BookingState state,
-	                                           @RequestHeader(USER_HEADER) @Positive Integer bookerId) {
+	public List<BookingResponseDto> getBookersBookings(@RequestParam(required = false, defaultValue = "ALL") BookingState state,
+	                                                   @RequestHeader(USER_HEADER) @Positive Integer bookerId) {
 		return bookService.getBookersBookings(bookerId, state);
 	}
 
 	@GetMapping("/owner")
-	public List<BookingDto> getOwnersBookings(@RequestParam(required = false, defaultValue = "ALL") BookingState state,
-	                                          @RequestHeader(USER_HEADER) @Positive Integer ownerId) {
+	public List<BookingResponseDto> getOwnersBookings(@RequestParam(required = false, defaultValue = "ALL") BookingState state,
+	                                                  @RequestHeader(USER_HEADER) @Positive Integer ownerId) {
 		return bookService.getOwnersBookings(ownerId, state);
 	}
 

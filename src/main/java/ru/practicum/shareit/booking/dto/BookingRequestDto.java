@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @StartEndFields
-public class BookingCreationDto {
+public class BookingRequestDto {
 	@NotNull
 	public Integer itemId;
 	@NotNull

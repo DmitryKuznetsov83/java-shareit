@@ -11,7 +11,7 @@ import javax.validation.constraints.Null;
 
 @Data
 @NoArgsConstructor
-public class ItemDto {
+public class ItemRequestDto {
 	@Null(groups = OnCreate.class)
 	@NotNull(groups = OnUpdate.class)
 	private Integer id;

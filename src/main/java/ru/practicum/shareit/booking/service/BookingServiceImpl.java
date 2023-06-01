@@ -8,8 +8,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.*;
-import ru.practicum.shareit.booking.dto.BookingCreationDto;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.enums.BookingState;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.exception.IncorrectStatusChangeException;
@@ -37,16 +37,16 @@ public class BookingServiceImpl implements BookingService {
 
 	@Transactional
 	@Override
-	public BookingDto addBooking(BookingCreationDto bookingCreationDto, Integer bookerId) {
+	public BookingResponseDto addBooking(BookingRequestDto bookingRequestDto, Integer bookerId) {
 		User booker = userService.getUserEntityById(bookerId);
-		Item item = itemService.getItemEntityById(bookingCreationDto.getItemId());
+		Item item = itemService.getItemEntityById(bookingRequestDto.getItemId());
 		if (!item.getAvailable()) {
 			throw new ResourceNotAvailableException("Item", item.getId());
 		}
 		if (booker.equals(item.getOwner())) {
 			throw new SelfBookingException();
 		}
-		Booking newBooking = BookingMapper.mapToNewBooking(bookingCreationDto, booker, item);
+		Booking newBooking = BookingMapper.mapToNewBooking(bookingRequestDto, booker, item);
 		Booking savedBooking = bookingJpaRepository.save(newBooking);
 		log.info("Create booking by booker {} for item {} with id {}", bookerId, item.getId(), savedBooking.getId());
 		return BookingMapper.mapToBookingDto(savedBooking);
@@ -54,7 +54,7 @@ public class BookingServiceImpl implements BookingService {
 
 	@Transactional
 	@Override
-	public BookingDto approveBooking(Integer bookingId, Integer userId, boolean approved) {
+	public BookingResponseDto approveBooking(Integer bookingId, Integer userId, boolean approved) {
 		Booking booking = getBookingById(bookingId);
 		User user = userService.getUserEntityById(userId);
 		if (!user.equals(booking.getItem().getOwner())) {
@@ -71,7 +71,7 @@ public class BookingServiceImpl implements BookingService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public BookingDto getBookingById(Integer bookingId, Integer userId) {
+	public BookingResponseDto getBookingById(Integer bookingId, Integer userId) {
 		Booking booking = getBookingById(bookingId);
 		User user = userService.getUserEntityById(userId);
 		if (!user.equals(booking.getBooker()) && !user.equals(booking.getItem().getOwner())) {
@@ -82,14 +82,14 @@ public class BookingServiceImpl implements BookingService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<BookingDto> getBookersBookings(Integer bookerId, BookingState state) {
+	public List<BookingResponseDto> getBookersBookings(Integer bookerId, BookingState state) {
 		User booker = userService.getUserEntityById(bookerId);
 		return getBookings(bookerId, state, true);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<BookingDto> getOwnersBookings(Integer ownerId, BookingState state) {
+	public List<BookingResponseDto> getOwnersBookings(Integer ownerId, BookingState state) {
 		User owner = userService.getUserEntityById(ownerId);
 		return getBookings(ownerId, state, false);
 	}
@@ -100,7 +100,7 @@ public class BookingServiceImpl implements BookingService {
 				.orElseThrow(() -> new ResourceNotFoundException("Booking", bookingId));
 	}
 
-	private List<BookingDto> getBookings(Integer userId, BookingState state, boolean booker) {
+	private List<BookingResponseDto> getBookings(Integer userId, BookingState state, boolean booker) {
 
 		LocalDateTime now = LocalDateTime.now();
 		List<Predicate> predicateList = new ArrayList<>();

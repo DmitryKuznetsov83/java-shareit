@@ -11,11 +11,11 @@ import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.exception.ResourceNotFoundException;
 import ru.practicum.shareit.exception.UnauthorizedChangeException;
 import ru.practicum.shareit.exception.UnauthorizedCommentException;
-import ru.practicum.shareit.item.dto.comment.CommentCreationDto;
-import ru.practicum.shareit.item.dto.comment.CommentDto;
-import ru.practicum.shareit.item.dto.item.ItemDto;
-import ru.practicum.shareit.item.dto.item.ItemWithBookingAndCommentsDto;
-import ru.practicum.shareit.item.dto.item.ItemWithBookingDto;
+import ru.practicum.shareit.item.dto.comment.CommentRequestDto;
+import ru.practicum.shareit.item.dto.comment.CommentResponseDto;
+import ru.practicum.shareit.item.dto.item.ItemRequestDto;
+import ru.practicum.shareit.item.dto.item.ItemWithBookingAndCommentsResponseDto;
+import ru.practicum.shareit.item.dto.item.ItemWithBookingResponseDto;
 import ru.practicum.shareit.item.entity.Comment;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.item.mapper.CommentMapper;
@@ -45,9 +45,9 @@ public class ItemServiceImpl implements ItemService {
 
 	@Transactional
 	@Override
-	public ItemDto addItem(ItemDto itemDto, Integer ownerId) {
+	public ItemRequestDto addItem(ItemRequestDto itemRequestDto, Integer ownerId) {
 		User owner = userService.getUserEntityById(ownerId);
-		Item newItem = ItemMapper.mapToNewItem(itemDto, owner);
+		Item newItem = ItemMapper.mapToNewItem(itemRequestDto, owner);
 		Item savedItem = itemRepository.save(newItem);
 		log.info("Create item with name {} id {}", savedItem.getName(), savedItem.getId());
 		return ItemMapper.mapToItemDto(savedItem);
@@ -55,14 +55,14 @@ public class ItemServiceImpl implements ItemService {
 
 	@Transactional
 	@Override
-	public ItemDto patchItem(Integer itemId, Integer userId, Map<String, String> patch) {
+	public ItemRequestDto patchItem(Integer itemId, Integer userId, Map<String, String> patch) {
 		Item item = getItemEntityById(itemId);
 		User user = userService.getUserEntityById(userId);
 		if (!item.getOwner().equals(user)) {
 			throw new UnauthorizedChangeException("Item", itemId);
 		}
-		ItemDto itemDto = ItemMapper.mapToItemDto(item);
-		ItemDto patchedItemDto = DtoManager.patch(itemDto, patch);
+		ItemRequestDto itemRequestDto = ItemMapper.mapToItemDto(item);
+		ItemRequestDto patchedItemDto = DtoManager.patch(itemRequestDto, patch);
 		DtoManager.validate(patchedItemDto);
 		Item pachedItem = ItemMapper.mapToItem(patchedItemDto, user);
 		Item savedItem = itemRepository.save(pachedItem);
@@ -72,25 +72,25 @@ public class ItemServiceImpl implements ItemService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public ItemWithBookingAndCommentsDto getItemById(int itemId, int userId) {
+	public ItemWithBookingAndCommentsResponseDto getItemById(int itemId, int userId) {
 		Item item = getItemEntityById(itemId);
 		List<Comment> comments = commentJpaRepository.findAllByItemOrderByCreatedDesc(item);
-		ItemWithBookingAndCommentsDto itemWithBookingAndCommentsDto = ItemMapper.mapToItemDetailedDto(item);
-		List<ItemWithBookingAndCommentsDto.ItemDetailedCommentDto> commentsDto = CommentMapper
+		ItemWithBookingAndCommentsResponseDto itemWithBookingAndCommentsResponseDto = ItemMapper.mapToItemDetailedDto(item);
+		List<ItemWithBookingAndCommentsResponseDto.ItemDetailedCommentDto> commentsDto = CommentMapper
 				.mapToItemDetailedCommentDtoList(comments);
-		itemWithBookingAndCommentsDto.setComments(commentsDto);
+		itemWithBookingAndCommentsResponseDto.setComments(commentsDto);
 		if (item.getOwner().getId().equals(userId)) {
 			LocalDateTime now = LocalDateTime.now();
 			List<Booking> nextAndLastBooking = bookingJpaRepository.findLastAndNextBooking(item.getId(), now);
 			nextAndLastBooking.forEach(b -> {
 				if (b.getStart().isBefore(now)) {
-					itemWithBookingAndCommentsDto.setLastBooking(BookingMapper.mapToBookingShortDto(b));
+					itemWithBookingAndCommentsResponseDto.setLastBooking(BookingMapper.mapToBookingShortDto(b));
 				} else if (b.getStart().isAfter(now)) {
-					itemWithBookingAndCommentsDto.setNextBooking(BookingMapper.mapToBookingShortDto(b));
+					itemWithBookingAndCommentsResponseDto.setNextBooking(BookingMapper.mapToBookingShortDto(b));
 				}
 			});
 		}
-		return itemWithBookingAndCommentsDto;
+		return itemWithBookingAndCommentsResponseDto;
 	}
 
 	@Transactional(readOnly = true)
@@ -101,25 +101,25 @@ public class ItemServiceImpl implements ItemService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ItemWithBookingDto> getItems(Integer ownerId) {
+	public List<ItemWithBookingResponseDto> getItems(Integer ownerId) {
 		User owner = userService.getUserEntityById(ownerId);
 		List<ItemWithBookingProjection> projectionList = itemRepository.findByOwnerWithBookingDto(ownerId, LocalDateTime.now());
 		return projectionList
 				.stream()
-				.map(ItemWithBookingDto::new)
+				.map(ItemWithBookingResponseDto::new)
 				.collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ItemDto> search(String text) {
+	public List<ItemRequestDto> search(String text) {
 		return ItemMapper.mapToItemDtoList(itemRepository
 				.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableIsTrue(text, text));
 	}
 
 	@Transactional
 	@Override
-	public CommentDto addComment(Integer itemId, Integer authorId, CommentCreationDto commentCreationDto) {
+	public CommentResponseDto addComment(Integer itemId, Integer authorId, CommentRequestDto commentRequestDto) {
 		Item item = getItemEntityById(itemId);
 		User author = userService.getUserEntityById(authorId);
 		List<Booking> bookings = bookingJpaRepository.findAllByItemAndBookerAndStatusAndEndIsLessThanOrderByStartDesc(item,
@@ -128,7 +128,7 @@ public class ItemServiceImpl implements ItemService {
 			throw new UnauthorizedCommentException("Comment for item " + itemId + " is not legal");
 		}
 		Comment newComment = Comment.builder()
-				.text(commentCreationDto.getText())
+				.text(commentRequestDto.getText())
 				.item(item)
 				.author(author)
 				.build();

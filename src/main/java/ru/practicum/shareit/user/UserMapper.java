@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user;
 
 import org.modelmapper.ModelMapper;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
 import java.util.stream.Collectors;

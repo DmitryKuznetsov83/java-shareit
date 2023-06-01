@@ -1,10 +1,9 @@
 package ru.practicum.shareit.item.mapper;
 
 import org.modelmapper.ModelMapper;
-import ru.practicum.shareit.item.dto.comment.CommentDto;
-import ru.practicum.shareit.item.dto.item.ItemWithBookingAndCommentsDto;
+import ru.practicum.shareit.item.dto.comment.CommentResponseDto;
 import ru.practicum.shareit.item.entity.Comment;
-import ru.practicum.shareit.item.dto.item.ItemWithBookingAndCommentsDto.ItemDetailedCommentDto;
+import ru.practicum.shareit.item.dto.item.ItemWithBookingAndCommentsResponseDto.ItemDetailedCommentDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,8 +12,8 @@ public class CommentMapper {
 
 	private static final ModelMapper modelMapper = new ModelMapper();
 
-	public static CommentDto mapToCommentDto(Comment comment) {
-		return modelMapper.map(comment, CommentDto.class);
+	public static CommentResponseDto mapToCommentDto(Comment comment) {
+		return modelMapper.map(comment, CommentResponseDto.class);
 	}
 
 	public static List<ItemDetailedCommentDto> mapToItemDetailedCommentDtoList(List<Comment> commentList) {

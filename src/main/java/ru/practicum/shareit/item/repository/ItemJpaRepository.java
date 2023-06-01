@@ -13,6 +13,7 @@ public interface ItemJpaRepository extends JpaRepository<Item, Integer> {
 
 	List<Item> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableIsTrue(String nameSearch,
 	                                                                                             String descSearch);
+
 	@Query(nativeQuery = true, value = "SELECT\n" +
 				"    ITEMS_BOOKINGS.ID AS id,\n" +
 				"    ITEMS_BOOKINGS.NAME AS name,\n" +
