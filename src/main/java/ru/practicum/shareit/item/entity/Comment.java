@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.entity;
 
+import com.querydsl.core.annotations.QueryExclude;
 import lombok.*;
 import ru.practicum.shareit.user.User;
 
@@ -7,6 +8,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@QueryExclude
 @Table(name = "СOMMENTS")
 @Data
 @NoArgsConstructor

@@ -13,6 +13,8 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,16 +47,20 @@ public class ItemController {
 	}
 
 	@GetMapping
-	public List<ItemWithBookingResponseDto> getItems(@RequestHeader(USER_HEADER) Integer ownerId) {
-		return itemService.getItems(ownerId);
+	public List<ItemWithBookingResponseDto> getItems(@RequestHeader(USER_HEADER) Integer ownerId,
+													 @RequestParam(required = false) @PositiveOrZero Integer from,
+	                                                 @RequestParam(required = false) @Positive Integer size) {
+		return itemService.getItems(ownerId, from, size);
 	}
 
 	@GetMapping("/search")
-	public List<ItemRequestDto> searchItems(@RequestParam String text) {
+	public List<ItemRequestDto> searchItems(@RequestParam String text,
+	                                        @RequestParam(required = false) @PositiveOrZero Integer from,
+	                                        @RequestParam(required = false) @Positive Integer size) {
 		if (text.isBlank()) {
 			return Collections.emptyList();
 		}
-		return itemService.search(text);
+		return itemService.search(text, from, size);
 	}
 
 	@PostMapping("/{itemId}/comment")

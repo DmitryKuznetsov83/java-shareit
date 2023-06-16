@@ -1,5 +1,7 @@
 package ru.practicum.shareit.user.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.aop.OnCreate;
@@ -13,6 +15,8 @@ import javax.validation.constraints.Null;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserDto {
 	@Null(groups = OnCreate.class)
 	@NotNull(groups = OnUpdate.class)

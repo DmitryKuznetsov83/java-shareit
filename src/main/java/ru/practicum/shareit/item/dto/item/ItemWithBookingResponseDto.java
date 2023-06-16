@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item.dto.item;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingShortResponseDto;
@@ -7,6 +9,8 @@ import ru.practicum.shareit.item.repository.ItemWithBookingProjection;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ItemWithBookingResponseDto {
 	private Integer id;
 	private String name;

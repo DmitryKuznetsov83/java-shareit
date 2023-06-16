@@ -17,6 +17,7 @@ import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -51,40 +52,44 @@ public class BookingController {
 
 	@GetMapping()
 	public List<BookingResponseDto> getBookersBookings(@RequestParam(required = false, defaultValue = "ALL") BookingState state,
+	                                                   @RequestParam(required = false) @PositiveOrZero Integer from,
+	                                                   @RequestParam(required = false) @Positive Integer size,
 	                                                   @RequestHeader(USER_HEADER) @Positive Integer bookerId) {
-		return bookService.getBookersBookings(bookerId, state);
+		return bookService.getBookersBookings(bookerId, state, from, size);
 	}
 
 	@GetMapping("/owner")
 	public List<BookingResponseDto> getOwnersBookings(@RequestParam(required = false, defaultValue = "ALL") BookingState state,
+	                                                  @RequestParam(required = false) @PositiveOrZero Integer from,
+	                                                  @RequestParam(required = false) @Positive Integer size,
 	                                                  @RequestHeader(USER_HEADER) @Positive Integer ownerId) {
-		return bookService.getOwnersBookings(ownerId, state);
+		return bookService.getOwnersBookings(ownerId, state, from, size);
 	}
 
 	@ExceptionHandler({ResourceNotAvailableException.class})
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ErrorResponse handleItemNotAvailableException(final ResourceNotAvailableException e) {
+	private ErrorResponse handleItemNotAvailableException(final ResourceNotAvailableException e) {
 		log.warn("Bad query: {}", e.getMessage());
 		return new ErrorResponse(HttpStatus.BAD_REQUEST,"Conflict operation", e.getMessage());
 	}
 
 	@ExceptionHandler({IncorrectStatusChangeException.class})
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ErrorResponse handleIncorrectStatusChangeException(final IncorrectStatusChangeException e) {
+	private ErrorResponse handleIncorrectStatusChangeException(final IncorrectStatusChangeException e) {
 		log.warn("Bad query: {}", e.getMessage());
 		return new ErrorResponse(HttpStatus.BAD_REQUEST,"Forbidden operation", e.getMessage());
 	}
 
 	@ExceptionHandler({UnknownBookingStateException.class})
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ErrorResponse handleUnsupportedBookingStateStatusException(final UnknownBookingStateException e) {
+	private ErrorResponse handleUnsupportedBookingStateStatusException(final UnknownBookingStateException e) {
 		log.warn("Bad query: {}", e.getMessage());
 		return new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), "");
 	}
 
 	@ExceptionHandler({SelfBookingException.class})
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public ErrorResponse handleSelfBookingException(final SelfBookingException e) {
+	private ErrorResponse handleSelfBookingException(final SelfBookingException e) {
 		log.warn("Bad query: {}", e.getMessage());
 		return new ErrorResponse(HttpStatus.NOT_FOUND, "Forbidden operation", e.getMessage());
 	}

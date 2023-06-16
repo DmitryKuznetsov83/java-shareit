@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.dto;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.annotation.StartEndFields;
@@ -11,6 +13,8 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @StartEndFields
 public class BookingRequestDto {
 	@NotNull
