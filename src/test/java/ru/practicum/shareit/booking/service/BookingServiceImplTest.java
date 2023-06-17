@@ -215,7 +215,8 @@ class BookingServiceImplTest {
 		bookingService.getOwnersBookings(1, BookingState.WAITING, null, null);
 	}
 
-	void _whenPagination_thenEmptyListReturned() {
+	@Test
+	void getOwnersBookings_whenPagination_thenEmptyListReturned() {
 		// when
 		when(bookingJpaRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(Page.empty());
 		// then

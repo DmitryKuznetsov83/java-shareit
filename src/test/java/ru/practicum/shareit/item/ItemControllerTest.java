@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -46,7 +45,7 @@ class ItemControllerTest {
 	@SneakyThrows
 	void postItem_whenItemIsValid_thenItemPosted() {
 		// given
-		ItemRequestDto itemRequestDto = itemRequestDto = ItemRequestDto.builder()
+		ItemRequestDto itemRequestDto = ItemRequestDto.builder()
 				.name("Item A")
 				.description("Item A description")
 				.available(true)
@@ -245,11 +244,6 @@ class ItemControllerTest {
 		// given
 		CommentRequestDto commentRequestDto = CommentRequestDto.builder()
 				.text("new comment")
-				.build();
-		CommentResponseDto commentResponseDto = CommentResponseDto.builder()
-				.text("new comment")
-				.authorName("Author")
-				.created(LocalDateTime.now())
 				.build();
 
 		// when

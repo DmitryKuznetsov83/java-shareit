@@ -10,7 +10,6 @@ import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.user.User;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,25 +28,31 @@ class BookingJpaRepositoryTest {
 	private User owner;
 	private User booker;
 	private Item item;
-	private Booking lastBooking;
-	private Booking nextBooking;
-	private Booking afterNextBooking;
+
+	LocalDateTime lbStart;
+	LocalDateTime lbEnd;
+	LocalDateTime nbStart;
+	LocalDateTime nbEnd;
+	LocalDateTime anbStart;
+	LocalDateTime anbEnd;
+
 
 	@BeforeEach
-	void SetUp() {
-		LocalDateTime lbStart = LocalDateTime.now().minusDays(10);
-		LocalDateTime lbEnd = LocalDateTime.now().minusDays(9);
-		LocalDateTime nbStart = LocalDateTime.now().plusDays(9);
-		LocalDateTime nbEnd = LocalDateTime.now().minusDays(10);
-		LocalDateTime anbStart = LocalDateTime.now().plusDays(19);
-		LocalDateTime anbEnd = LocalDateTime.now().minusDays(20);
-
+	void setUp() {
 		owner = User.builder().name("Owner").email("owner@mail.org").build();
 		booker = User.builder().name("Booker").email("booker@mail.org").build();
 		item = Item.builder().name("Item A").description("Item A").available(true).owner(owner).build();
-		lastBooking = Booking.builder().start(lbStart).end(lbEnd).item(item).booker(booker).status(BookingStatus.APPROVED).build();
-		nextBooking = Booking.builder().start(nbStart).end(nbEnd).item(item).booker(booker).status(BookingStatus.APPROVED).build();
-		afterNextBooking = Booking.builder().start(anbStart).end(anbEnd).item(item).booker(booker).status(BookingStatus.APPROVED).build();
+
+		lbStart = LocalDateTime.now().minusDays(10);
+		lbEnd = LocalDateTime.now().minusDays(9);
+		nbStart = LocalDateTime.now().plusDays(9);
+		nbEnd = LocalDateTime.now().plusDays(10);
+		anbStart = LocalDateTime.now().plusDays(19);
+		anbEnd = LocalDateTime.now().plusDays(20);
+
+		//lastBooking = Booking.builder().start(lbStart).end(lbEnd).item(item).booker(booker).status(BookingStatus.APPROVED).build();
+		//nextBooking = Booking.builder().start(nbStart).end(nbEnd).item(item).booker(booker).status(BookingStatus.APPROVED).build();
+		//afterNextBooking = Booking.builder().start(anbStart).end(anbEnd).item(item).booker(booker).status(BookingStatus.APPROVED).build();
 	}
 
 	@Test
@@ -56,9 +61,9 @@ class BookingJpaRepositoryTest {
 		// given
 		em.persist(owner);
 		em.persist(booker);
-		em.persist(item);
+		Item persistedItem = em.persist(item);
 		// when
-		List<Booking> bookingList = repository.findLastAndNextBooking(1, LocalDateTime.now());
+		List<Booking> bookingList = repository.findLastAndNextBooking(persistedItem.getId(), LocalDateTime.now());
 		// then
 		assertTrue(bookingList.isEmpty());
 	}
@@ -69,10 +74,12 @@ class BookingJpaRepositoryTest {
 		// given
 		em.persist(owner);
 		em.persist(booker);
-		em.persist(item);
+		Item persistedItem = em.persist(item);
+		Booking lastBooking = Booking.builder()
+				.start(lbStart).end(lbEnd).item(persistedItem).booker(booker).status(BookingStatus.APPROVED).build();
 		em.persist(lastBooking);
 		// when
-		List<Booking> bookingList = repository.findLastAndNextBooking(1, LocalDateTime.now());
+		List<Booking> bookingList = repository.findLastAndNextBooking(persistedItem.getId(), LocalDateTime.now());
 		// then
 		assertThat(bookingList, containsInAnyOrder(lastBooking));
 	}
@@ -83,11 +90,15 @@ class BookingJpaRepositoryTest {
 		// given
 		em.persist(owner);
 		em.persist(booker);
-		em.persist(item);
+		Item persistedItem = em.persist(item);
+		Booking lastBooking = Booking.builder()
+				.start(lbStart).end(lbEnd).item(persistedItem).booker(booker).status(BookingStatus.APPROVED).build();
+		Booking nextBooking = Booking.builder()
+				.start(nbStart).end(nbEnd).item(persistedItem).booker(booker).status(BookingStatus.APPROVED).build();
 		em.persist(lastBooking);
 		em.persist(nextBooking);
 		// when
-		List<Booking> bookingList = repository.findLastAndNextBooking(1, LocalDateTime.now());
+		List<Booking> bookingList = repository.findLastAndNextBooking(persistedItem.getId(), LocalDateTime.now());
 		// then
 		assertThat(bookingList, containsInAnyOrder(lastBooking, nextBooking));
 	}
@@ -98,12 +109,18 @@ class BookingJpaRepositoryTest {
 		// given
 		em.persist(owner);
 		em.persist(booker);
-		em.persist(item);
+		Item persistedItem =  em.persist(item);
+		Booking lastBooking = Booking.builder()
+				.start(lbStart).end(lbEnd).item(persistedItem).booker(booker).status(BookingStatus.APPROVED).build();
+		Booking nextBooking = Booking.builder()
+				.start(nbStart).end(nbEnd).item(persistedItem).booker(booker).status(BookingStatus.APPROVED).build();
+		Booking afterNextBooking = Booking.builder()
+				.start(anbStart).end(anbEnd).item(persistedItem).booker(booker).status(BookingStatus.APPROVED).build();
 		em.persist(lastBooking);
 		em.persist(nextBooking);
 		em.persist(afterNextBooking);
 		// when
-		List<Booking> bookingList = repository.findLastAndNextBooking(1, LocalDateTime.now());
+		List<Booking> bookingList = repository.findLastAndNextBooking(persistedItem.getId(), LocalDateTime.now());
 		// then
 		assertThat(bookingList, containsInAnyOrder(lastBooking, nextBooking));
 	}
