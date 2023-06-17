@@ -38,7 +38,7 @@ class UserControllerTest {
 
 	@Test
 	@SneakyThrows
-	void postUser_whenCorrectUser_thenReturnUser() {
+	void postUser_whenCorrectUser_thenUserPosted() {
 		// given
 		UserDto requestDto = UserDto.builder()
 				.name("User A")
@@ -64,7 +64,7 @@ class UserControllerTest {
 
 	@Test
 	@SneakyThrows
-	void postUser_whenBadEmail_thenBadRequest() {
+	void postUser_whenBadEmail_thenStatusIsBadRequest() {
 		// given
 		UserDto requestDto = UserDto.builder()
 				.name("User A")
@@ -84,7 +84,7 @@ class UserControllerTest {
 
 	@Test
 	@SneakyThrows
-	void patchUser_whenPatchNotHasId() {
+	void patchUser_whenPatchNotHasId_ThenUserPatched() {
 		// given
 		Map<String, String> patch = new HashMap<>();
 		patch.put("name", "updated User A");
@@ -107,7 +107,7 @@ class UserControllerTest {
 
 	@Test
 	@SneakyThrows
-	void patchUser_whenPatchHasId() {
+	void patchUser_whenPatchHasId_thenStatusIsBadRequest() {
 		// given
 		Map<String, String> patch = new HashMap<>();
 		patch.put("id", "100");
@@ -144,8 +144,9 @@ class UserControllerTest {
 				.email("user_a@mail.org")
 				.build();
 
-		when(userService.getUserById(anyInt())).thenReturn(responseDto);
 		// when
+		when(userService.getUserById(anyInt())).thenReturn(responseDto);
+
 		mvc.perform(get("/users/1")
 						.accept(MediaType.APPLICATION_JSON))
 
@@ -156,9 +157,10 @@ class UserControllerTest {
 
 	@Test
 	@SneakyThrows
-	void getUserById_whenUserNotFound_thenThrowResourceNotFoundException() {
-		doThrow(ResourceNotFoundException.class).when(userService).getUserById(anyInt());
+	void getUserById_whenUserNotFound_thenResourceNotFoundExceptionThrown() {
 		// when
+		doThrow(ResourceNotFoundException.class).when(userService).getUserById(anyInt());
+
 		mvc.perform(get("/users/1")
 						.accept(MediaType.APPLICATION_JSON))
 

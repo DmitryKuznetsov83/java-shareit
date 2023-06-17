@@ -22,7 +22,7 @@ public class UserServiceTestIT {
 	private final UserService userService;
 
 	@Test
-	void getUserById_whenUserPresent_thenReturnUser() {
+	void getUserById_whenUserPresent_thenUserReturned() {
 		// given
 		UserDto user = UserDto.builder().name("Name").email("mail@mail.ru").build();
 		userService.addUser(user);
@@ -33,12 +33,12 @@ public class UserServiceTestIT {
 	}
 
 	@Test
-	void getUserById_whenUserNotPresent_thenThrowResourceNotFoundException() {
+	void getUserById_whenUserNotPresent_thenResourceNotFoundExceptionThrown() {
 		// given
 		UserDto user = UserDto.builder().name("Name").email("mail@mail.ru").build();
+		// when
 		userService.addUser(user);
-
-		// when, then
+		// then
 		assertThrows(ResourceNotFoundException.class, () -> userService.getUserEntityById(2));
 	}
 

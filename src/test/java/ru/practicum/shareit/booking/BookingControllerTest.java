@@ -71,7 +71,7 @@ class BookingControllerTest {
 
 	@Test
 	@SneakyThrows
-	void postBooking_whenItemIsAvailable_thenPostBooking() {
+	void postBooking_whenItemIsAvailable_thenBookingPosted() {
 		// when
 		when(bookingService.addBooking(bookingRequestDto, 1)).thenReturn(bookingResponseDto);
 
@@ -92,7 +92,7 @@ class BookingControllerTest {
 
 	@Test
 	@SneakyThrows
-	void postBooking_whenItemIsNotAvailable_thenThrowItemNotAvailableException() {
+	void postBooking_whenItemIsNotAvailable_thenItemNotAvailableExceptionThrown() {
 		// when
 		when(bookingService.addBooking(any(), anyInt())).thenThrow(new ResourceNotAvailableException("Item", 1));
 		mvc.perform(post("/bookings")
@@ -110,7 +110,7 @@ class BookingControllerTest {
 
 	@Test
 	@SneakyThrows
-	void postBooking_whenBookerIsOwner_thenThrowSelfBookingException() {
+	void postBooking_whenBookerIsOwner_thenSelfBookingExceptionThrown() {
 		// when
 		when(bookingService.addBooking(any(), anyInt())).thenThrow(new SelfBookingException());
 
@@ -129,7 +129,7 @@ class BookingControllerTest {
 
 	@Test
 	@SneakyThrows
-	void postBooking_whenNoBookerHeader_thenThrowMissingRequestHeaderException() {
+	void postBooking_whenNoBookerHeader_thenMissingRequestHeaderExceptionThrown() {
 		// when
 		mvc.perform(post("/bookings")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +145,7 @@ class BookingControllerTest {
 
 	@Test
 	@SneakyThrows
-	void approveBooking_whenStatusIsWaiting_thenApproveBooking() {
+	void approveBooking_whenStatusIsWaiting_thenBookingApproved() {
 		// given
 		bookingResponseDto.setStatus(BookingStatus.APPROVED);
 
@@ -169,10 +169,10 @@ class BookingControllerTest {
 
 	@Test
 	@SneakyThrows
-	void approveBooking_whenStatusIsNotWaiting_thenThrowIncorrectStatusChangeException() {
-
+	void approveBooking_whenStatusIsNotWaiting_thenIncorrectStatusChangeExceptionThrown() {
 		// when
 		when(bookingService.approveBooking(anyInt(), anyInt(), anyBoolean())).thenThrow(new IncorrectStatusChangeException());
+
 		mvc.perform(patch("/bookings/1")
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON)
@@ -188,7 +188,7 @@ class BookingControllerTest {
 
 	@Test
 	@SneakyThrows
-	void getBooking() {
+	void getBooking_whenBookingFound_thenBookingReturned() {
 		// when
 		when(bookingService.getBookingById(1, 1)).thenReturn(bookingResponseDto);
 
@@ -223,7 +223,7 @@ class BookingControllerTest {
 
 	@Test
 	@SneakyThrows
-	void getBookersBookings_whenStateIsNotCorrect_thenStatusIsBadRequest() {
+	void getBookersBookings_whenStateIsIncorrect_thenStatusIsBadRequest() {
 		// when
 		mvc.perform(get("/bookings")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -239,7 +239,7 @@ class BookingControllerTest {
 
 	@Test
 	@SneakyThrows
-	void getOwnersBookings() {
+	void getOwnersBookings_whenStateIsCorrect_thenStatusIsOk() {
 		// when
 		mvc.perform(get("/bookings/owner")
 						.contentType(MediaType.APPLICATION_JSON)

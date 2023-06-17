@@ -73,8 +73,6 @@ class RequestServiceImplTest {
 				.email("user@mail.org")
 				.build();
 
-
-
 		item = Item.builder()
 				.name("Item A")
 				.description("Item A description")
@@ -82,16 +80,13 @@ class RequestServiceImplTest {
 				.owner(user)
 				.request(request)
 				.build();
-
-
 	}
 
 	@Test
 	void addRequest_whenRequesterFound_thenRequestAdded() {
-		// given
+		// when
 		when(userService.getUserEntityById(1)).thenReturn(requester);
 		when(requestJpaRepository.save(any())).then(returnsFirstArg());
-		// when
 		RequestResponseDto requestResponseDto = requestService.addRequest(requestRequestDto, 1);
 		// then
 		assertThat(requestResponseDto.getDescription(), equalTo(requestRequestDto.getDescription()));
@@ -99,54 +94,46 @@ class RequestServiceImplTest {
 	}
 
 	@Test
-	void getRequestById_whenRequestFound_thenRequestRetrieved() {
-		// given
+	void getRequestById_whenRequestFound_thenRequestReturned() {
+		// when
 		when(requestJpaRepository.findById(anyInt())).thenReturn(Optional.of(request));
 		when(userService.getUserEntityById(anyInt())).thenReturn(user);
 		when(itemService.getItemsByRequestId(anyInt())).thenReturn(Collections.emptyList());
-		// when
 		RequestResponseDto requestResponseDto = requestService.getRequestById(1, 1);
 		// then
 		assertThat(requestResponseDto.getDescription(), equalTo(request.getDescription()));
 	}
 
-
 	@Test
-	void getRequestEntityById() {
-	}
-
-	@Test
-	void getOwnRequests_whenRequesterFound_thenRequestListRetrieved() {
-		// given
+	void getOwnRequests_whenRequesterFound_thenRequestListReturned() {
+		// when
 		when(userService.getUserEntityById(anyInt())).thenReturn(user);
 		when(requestJpaRepository.findAllByRequesterIdOrderByCreatedAsc(anyInt())).thenReturn(Collections.singletonList(request));
 		when(itemService.getOwnRequestsItems(anyInt())).thenReturn(Collections.emptyList());
-		// when
 		List<RequestResponseDto> requestDtoList = requestService.getOwnRequests(1);
 		// then
 		assertThat(requestDtoList.size(), equalTo(1));
 	}
 
 	@Test
-	void getOthersRequests_whenUserFoundAndNoPagination_thenRequestListRetrieved() {
-		// given
+	void getOthersRequests_whenUserFoundAndNoPagination_thenRequestListReturned() {
+		// when
 		when(userService.getUserEntityById(anyInt())).thenReturn(user);
 		when(requestJpaRepository.findAllByRequesterIdNot(anyInt())).thenReturn(Collections.singletonList(request));
 		when(itemService.getOtherRequestsItems(anyInt())).thenReturn(Collections.singletonList(item));
-		// when
 		List<RequestResponseDto> requestDtoList = requestService.getOthersRequests(1, null, null);
 		// then
 		assertThat(requestDtoList.size(), equalTo(1));
 	}
 
 	@Test
-	void getOthersRequests_whenUserFoundAndPagination_thenEmptyListRetrieved() {
+	void getOthersRequests_whenUserFoundAndPagination_thenEmptyListReturned() {
 		// given
 		Page<Request> requestPage = new PageImpl<>(Collections.singletonList(request));
+		// when
 		when(userService.getUserEntityById(anyInt())).thenReturn(user);
 		when(requestJpaRepository.findAllByRequesterIdNot(anyInt(), any())).thenReturn(requestPage);
 		when(itemService.getItemsByRequestList(any())).thenReturn(Collections.singletonList(item));
-		// when
 		List<RequestResponseDto> requestDtoList = requestService.getOthersRequests(1, 0, 10);
 		// then
 		assertThat(requestDtoList.size(), equalTo(1));

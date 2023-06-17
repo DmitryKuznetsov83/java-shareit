@@ -182,11 +182,10 @@ class ItemServiceImplTest {
 
 	@Test
 	void addItem_whenOwnerExistsAndRequestExists_thenItemAdded() {
-		// given
+		// when
 		when(userService.getUserEntityById(2)).thenReturn(owner);
 		when(requestService.getRequestEntityById(any())).thenReturn(request);
 		when(itemRepository.save(any())).then(returnsFirstArg());
-		// when
 		ItemRequestDto addedItemRequestDto = itemService.addItem(itemRequestDto, 2);
 		// then
 		assertThat(addedItemRequestDto.getName(), equalTo(itemRequestDto.getName()));
@@ -196,25 +195,24 @@ class ItemServiceImplTest {
 
 	@Test
 	void addItem_whenOwnerNotFound_thenItemNotAdded() {
-		// given
+		// when
 		doThrow(ResourceNotFoundException.class).when(userService).getUserEntityById(2);
-		// when, then
+		// then
 		assertThrows(ResourceNotFoundException.class, () -> itemService.addItem(itemRequestDto, 2));
 		verify(itemRepository, never()).save(item);
 	}
 
 
 	@Test
-	void patchItem_whenUserIsOwener_thenReturnPatchedItem() {
+	void patchItem_whenUserIsOwner_thenPatchedItemReturned() {
 		// given
 		Map<String, String> patch = new HashMap<>();
 		patch.put("name", "patched name");
+		// when
 		when(itemRepository.findById(any())).thenReturn(Optional.of(item));
 		when(userService.getUserEntityById(anyInt())).thenReturn(owner);
 		when(requestService.getRequestEntityById(anyInt())).thenReturn(request);
 		when(itemRepository.save(any())).then(returnsFirstArg());
-
-		// when
 		ItemRequestDto patchedItemRequest = itemService.patchItem(1, 1, patch);
 		// then
 		assertThat(patchedItemRequest.getName(), equalTo(patch.get("name")));
@@ -223,12 +221,11 @@ class ItemServiceImplTest {
 	}
 
 	@Test
-	void getItemById_whenItemFoundAndUserIsOwner_thenReturnItemWithBookings() {
-		// given
+	void getItemById_whenItemFoundAndUserIsOwner_thenItemWithBookingsReturned() {
+		// when
 		when(itemRepository.findById(1)).thenReturn(Optional.of(item));
 		when(commentJpaRepository.findAllByItemOrderByCreatedDesc(item)).thenReturn(Collections.singletonList(comment));
 		when(bookingService.getLastAndNextBookingOfItem(any())).thenReturn(Arrays.asList(lastBooking, nextBooking));
-		// when
 		ItemWithBookingAndCommentsResponseDto itemDto = itemService.getItemById(1, 2);
 		// then
 		assertThat(itemDto.getName(), equalTo(item.getName()));
@@ -239,11 +236,10 @@ class ItemServiceImplTest {
 	}
 
 	@Test
-	void getItemById_whenItemFoundAndUserIsNotOwner_thenReturnItemWithoutBookings() {
-		// given
+	void getItemById_whenItemFoundAndUserIsNotOwner_thenItemWithoutBookingsReturned() {
+		// when
 		when(itemRepository.findById(1)).thenReturn(Optional.of(item));
 		when(commentJpaRepository.findAllByItemOrderByCreatedDesc(item)).thenReturn(Collections.singletonList(comment));
-		// when
 		ItemWithBookingAndCommentsResponseDto itemDto = itemService.getItemById(1, 3);
 		// then
 		assertThat(itemDto.getName(), equalTo(item.getName()));
@@ -254,20 +250,20 @@ class ItemServiceImplTest {
 	}
 
 	@Test
-	void getItemById_whenItemNotFound_thenThrowResourceNotFoundException() {
-		// given
+	void getItemById_whenItemNotFound_thenResourceNotFoundExceptionThrown() {
+		// when
 		doThrow(ResourceNotFoundException.class).when(itemRepository).findById(any());
-		// when, then
+		// then
 		assertThrows(ResourceNotFoundException.class, () -> itemService.getItemById(1, 1));
 	}
 
 
 	@Test
 	void getItems_whenOwnItemsFoundAndNoPagination_thenListReturned() {
-		List<ItemWithBookingProjection> projectionList = Collections.singletonList(itemWithBookingProjection);
 		// given
-		when(itemRepository.findByOwnerWithBookingDto(any(), any())).thenReturn(projectionList);
+		List<ItemWithBookingProjection> projectionList = Collections.singletonList(itemWithBookingProjection);
 		// when
+		when(itemRepository.findByOwnerWithBookingDto(any(), any())).thenReturn(projectionList);
 		List<ItemWithBookingResponseDto> items = itemService.getItems(2, null, null);
 		// then
 		assertThat(items.size(), equalTo(1));
@@ -275,10 +271,10 @@ class ItemServiceImplTest {
 
 	@Test
 	void getItems_whenOwnItemsFoundAndPagination_thenListReturned() {
-		List<ItemWithBookingProjection> projectionList = Collections.singletonList(itemWithBookingProjection);
 		// given
-		when(itemRepository.findByOwnerWithBookingDto(any(), any(), any())).thenReturn(new PageImpl<>(projectionList));
+		List<ItemWithBookingProjection> projectionList = Collections.singletonList(itemWithBookingProjection);
 		// when
+		when(itemRepository.findByOwnerWithBookingDto(any(), any(), any())).thenReturn(new PageImpl<>(projectionList));
 		List<ItemWithBookingResponseDto> items = itemService.getItems(2, 0, 10);
 		// then
 		assertThat(items.size(), equalTo(1));
@@ -287,9 +283,8 @@ class ItemServiceImplTest {
 
 	@Test
 	void search_whenFound_thenListReturned() {
-		// given
-		when(itemRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableIsTrue(any(), any())).thenReturn(Collections.singletonList(item));
 		// when
+		when(itemRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableIsTrue(any(), any())).thenReturn(Collections.singletonList(item));
 		List<ItemRequestDto> items = itemService.search("text", null, null);
 		// then
 		assertThat(items.size(), equalTo(1));
@@ -297,12 +292,11 @@ class ItemServiceImplTest {
 
 	@Test
 	void addComment_whenFinishedBookingExist_thenCommentAdded() {
-		// given
+		// when
 		when(itemRepository.findById(anyInt())).thenReturn(Optional.of(item));
 		when(userService.getUserEntityById(anyInt())).thenReturn(requester);
 		when(bookingService.getFinishedBookingsByItemAndBooker(any(), any())).thenReturn(Collections.singletonList(lastBooking));
 		when(commentJpaRepository.save(any())).then(returnsFirstArg());
-		// when
 		CommentResponseDto commentResponseDto = itemService.addComment(1, 1, commentRequestDto);
 		// then
 		assertThat(commentResponseDto.getText(), equalTo("Comment"));
@@ -310,38 +304,46 @@ class ItemServiceImplTest {
 	}
 
 	@Test
-	void addComment_whenNoFinishedBooking_thenThrowUnauthorizedCommentException() {
-		// given
+	void addComment_whenNoFinishedBooking_thenUnauthorizedCommentExceptionThrown() {
+		// when
 		when(itemRepository.findById(anyInt())).thenReturn(Optional.of(item));
 		when(userService.getUserEntityById(anyInt())).thenReturn(requester);
 		when(bookingService.getFinishedBookingsByItemAndBooker(any(), any())).thenReturn(Collections.emptyList());
-		// when, then
+		// then
 		assertThrows(UnauthorizedCommentException.class, () -> itemService.addComment(1, 1, commentRequestDto));
 		verify(commentJpaRepository, never()).save(any());
 	}
 
 	@Test
 	void getItemsByRequestId() {
+		// when
 		itemService.getItemsByRequestId(1);
+		// then
 		verify(itemRepository).findAllByRequestId(anyInt());
 	}
 
 	@Test
 	void getOwnRequestsItems() {
+		// when
 		itemService.getOwnRequestsItems(1);
+		// then
 		verify(itemRepository).findAllByRequestRequesterId(anyInt());
 	}
 
 	@Test
 	void getOtherRequestsItems() {
+		// when
 		itemService.getOtherRequestsItems(1);
+		// then
 		verify(itemRepository).findAllByRequestRequesterIdNot(anyInt());
 	}
 
 	@Test
 	void getItemsByRequestList() {
+		// when
 		List<Request> requestList = Collections.singletonList(request);
 		itemService.getItemsByRequestList(requestList);
+		// then
 		verify(itemRepository).findAllByRequestIn(requestList);
 	}
 }

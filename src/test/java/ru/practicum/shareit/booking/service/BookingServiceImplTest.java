@@ -103,12 +103,11 @@ class BookingServiceImplTest {
 	}
 
 	@Test
-	void addBooking_whenItemIsAvailableAndBookerIsNotOwner() {
-		// given
+	void addBooking_whenItemIsAvailableAndBookerIsNotOwner_thenBookingReturned() {
+		// when
 		when(userService.getUserEntityById(2)).thenReturn(booker);
 		when(itemService.getItemEntityById(anyInt())).thenReturn(item);
 		when(bookingJpaRepository.save(any())).then(returnsFirstArg());
-		// when
 		BookingResponseDto bookingResponseDto = bookingService.addBooking(bookingRequestDto, 2);
 		// then
 		assertThat(bookingResponseDto.getStatus(), equalTo(BookingStatus.WAITING));
@@ -116,30 +115,29 @@ class BookingServiceImplTest {
 	}
 
 	@Test
-	void addBooking_whenItemIsNotAvailable_thenThrowResourceNotAvailableException() {
-		// given
+	void addBooking_whenItemIsNotAvailable_thenResourceNotAvailableExceptionThrow() {
+		// when
 		when(userService.getUserEntityById(2)).thenReturn(booker);
 		when(itemService.getItemEntityById(anyInt())).thenReturn(Item.builder().available(false).build());
-		// when, then
+		// then
 		assertThrows(ResourceNotAvailableException.class, () -> bookingService.addBooking(bookingRequestDto, 2));
 	}
 
 	@Test
-	void addBooking_whenBookerIsNotOwner_thenThrowResourceNotSelfBookingException() {
-		// given
+	void addBooking_whenBookerIsNotOwner_thenSelfBookingExceptionThrow() {
+		// when
 		when(userService.getUserEntityById(1)).thenReturn(owner);
 		when(itemService.getItemEntityById(anyInt())).thenReturn(item);
-		// when, then
+		// then
 		assertThrows(SelfBookingException.class, () -> bookingService.addBooking(bookingRequestDto, 1));
 	}
 
 	@Test
-	void approveBooking_when_UserIsIOwnerAndStatusIsWaiting() {
-		// given
+	void approveBooking_when_UserIsOwnerAndStatusIsWaiting_thenBookingApproved() {
+		// when
 		when(bookingJpaRepository.findById(1)).thenReturn(Optional.of(booking));
 		when(userService.getUserEntityById(1)).thenReturn(owner);
 		when(bookingJpaRepository.save(any())).then(returnsFirstArg());
-		// when
 		BookingResponseDto bookingResponseDto = bookingService.approveBooking(1, 1, true);
 		// then
 		assertThat(bookingResponseDto.getStatus(), equalTo(BookingStatus.APPROVED));
@@ -147,84 +145,97 @@ class BookingServiceImplTest {
 	}
 
 	@Test
-	void approveBooking_when_UserIsNotOwner() {
-		// given
+	void approveBooking_when_UserIsNotOwner_thenUnauthorizedChangeExceptionThrown() {
+		// when
 		when(bookingJpaRepository.findById(1)).thenReturn(Optional.of(booking));
 		when(userService.getUserEntityById(2)).thenReturn(booker);
-		// when, then
+		// then
 		assertThrows(UnauthorizedChangeException.class, () -> bookingService.approveBooking(1, 2, true));
 	}
 
 	@Test
-	void approveBooking_when_StatusIsNotWaiting() {
+	void approveBooking_when_StatusIsNotWaiting_thenIncorrectStatusChangeExceptionThrown() {
 		// given
 		booking.setStatus(BookingStatus.APPROVED);
+		// when
 		when(bookingJpaRepository.findById(1)).thenReturn(Optional.of(booking));
 		when(userService.getUserEntityById(1)).thenReturn(owner);
-		// when, then
+		// then
 		assertThrows(IncorrectStatusChangeException.class, () -> bookingService.approveBooking(1, 1, true));
 	}
 
 	@Test
-	void getBookingById_whenUserIsOwnerAndBookingFound_thenReturnBooking() {
-		// given
+	void getBookingById_whenUserIsOwnerAndBookingFound_thenBookingReturned() {
+		// when
 		when(bookingJpaRepository.findById(1)).thenReturn(Optional.of(booking));
 		when(userService.getUserEntityById(2)).thenReturn(booker);
-		// when
 		BookingResponseDto bookingResponseDto = bookingService.getBookingById(1, 2);
 		// then
 		assertNotNull(bookingResponseDto);
 	}
 
 	@Test
-	void getBookingById_whenUserIsNeitherOwnerNorBooker_thenThrowResourceNotFoundException() {
-		// given
+	void getBookingById_whenUserIsNeitherOwnerNorBooker_thenResourceNotFoundExceptionThrown() {
+		// when
 		when(userService.getUserEntityById(3)).thenReturn(new User());
 		when(bookingJpaRepository.findById(1)).thenReturn(Optional.of(booking));
-		// when
+		// then
 		assertThrows(ResourceNotFoundException.class, () -> bookingService.getBookingById(1, 3));
 	}
 
 
 	@Test
-	void getBookersBookings_whenStateIs_thenReturnList() {
-		// no pagination
+	void getBookersBookings_whenNoPagination_thenEmptyListReturned() {
+		// then
 		bookingService.getBookersBookings(2, BookingState.ALL, null, null);
 		bookingService.getBookersBookings(2, BookingState.CURRENT, null, null);
 		bookingService.getBookersBookings(2, BookingState.PAST, null, null);
 		bookingService.getBookersBookings(2, BookingState.FUTURE, null, null);
 		bookingService.getBookersBookings(2, BookingState.REJECTED, null, null);
 		bookingService.getBookersBookings(2, BookingState.WAITING, null, null);
-
-		// pagination
-		when(bookingJpaRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(Page.empty());
-		bookingService.getBookersBookings(2, BookingState.ALL, 0, 10);
 	}
 
 	@Test
-	void getOwnersBookings() {
-		// no pagination
+	void getBookersBookings_whenPagination_thenEmptyListReturned() {
+		// when
+		when(bookingJpaRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(Page.empty());
+		// then
+		bookingService.getBookersBookings(2, BookingState.ALL, 0, 10);
+	}
+
+
+	@Test
+	void getOwnersBookings_whenNoPagination_thenEmptyListReturned() {
+		// then
 		bookingService.getOwnersBookings(1, BookingState.ALL, null, null);
 		bookingService.getOwnersBookings(1, BookingState.CURRENT, null, null);
 		bookingService.getOwnersBookings(1, BookingState.PAST, null, null);
 		bookingService.getOwnersBookings(1, BookingState.FUTURE, null, null);
 		bookingService.getOwnersBookings(1, BookingState.REJECTED, null, null);
 		bookingService.getOwnersBookings(1, BookingState.WAITING, null, null);
+	}
 
-		// pagination
+	void _whenPagination_thenEmptyListReturned() {
+		// when
 		when(bookingJpaRepository.findAll(any(Predicate.class), any(PageRequest.class))).thenReturn(Page.empty());
+		// then
 		bookingService.getOwnersBookings(1, BookingState.ALL, 0, 10);
 	}
 
+
 	@Test
 	void getLastAndNextBookingOfItem() {
+		// when
 		bookingService.getLastAndNextBookingOfItem(1);
+		// then
 		verify(bookingJpaRepository).findLastAndNextBooking(anyInt(), any());
 	}
 
 	@Test
 	void getFinishedBookingsByItemAndBooker() {
+		// when
 		bookingService.getFinishedBookingsByItemAndBooker(item, booker);
+		// then
 		verify(bookingJpaRepository).findAllByItemAndBookerAndStatusAndEndIsLessThanOrderByStartDesc(any(), any(), any(), any());
 	}
 

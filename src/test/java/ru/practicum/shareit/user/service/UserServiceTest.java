@@ -37,61 +37,49 @@ class UserServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		userDto = UserDto.builder()
-				.name("Name")
-				.email("mail@mail.ogr")
-				.build();
-		user = User.builder()
-				.name("Name")
-				.email("mail@mail.ogr")
-				.build();
+		userDto = UserDto.builder().name("Name").email("mail@mail.ogr").build();
+		user = User.builder().name("Name").email("mail@mail.ogr").build();
 	}
 
 	@Test
-	void addUser_whenCorrectUser_thenSaved() {
-		// given
-		when(userJpaRepository.save(any())).thenReturn(user);
+	void addUser_whenUserIsCorrect_thenUserAdded() {
 		// when
+		when(userJpaRepository.save(any())).thenReturn(user);
 		UserDto addedUser = userService.addUser(userDto);
 		// then
 		assertThat(addedUser.getName(), equalTo(userDto.getName()));
 		assertThat(addedUser.getEmail(), equalTo(userDto.getEmail()));
-
 		verify(userJpaRepository).save(user);
 	}
 
 	@Test
-	void addUser_whenBadUser_thenNotSaved() {
-		// given
+	void addUser_whenUserIsNotCorrect_thenUserNotAdded() {
+		// when
 		doThrow(DataIntegrityViolationException.class).when(userJpaRepository).save(user);
-		// when, then
+		// then
 		assertThrows(DataIntegrityViolationException.class, () -> userService.addUser(userDto));
-
 		verify(userJpaRepository).save(user);
 	}
 
 	@Test
 	void patchUser_whenCorrectPatch_thenUserIsPatched() {
+		// given
 		Map<String, String> patch = new HashMap<>();
 		patch.put("name", "patched name");
-
-		// given
+		// when
 		when(userJpaRepository.findById(any())).thenReturn(Optional.ofNullable(user));
 		when(userJpaRepository.save(any())).then(returnsFirstArg());
-		// when
 		UserDto patchedUser = userService.patchUser(1, patch);
 		// then
 		assertThat(patchedUser.getName(), equalTo("patched name"));
 		assertThat(patchedUser.getEmail(), equalTo("mail@mail.ogr"));
-
 		verify(userJpaRepository).save(any());
 	}
 
 	@Test
 	void deleteUserById_whenUserFound_thenUserDeleted() {
-		// given
-		when(userJpaRepository.findById(1)).thenReturn(Optional.ofNullable(user));
 		// when
+		when(userJpaRepository.findById(1)).thenReturn(Optional.ofNullable(user));
 		userService.deleteUserById(1);
 		// then
 		verify(userJpaRepository).deleteById(1);
@@ -99,20 +87,18 @@ class UserServiceTest {
 
 	@Test
 	void deleteUserById_whenUserNotFound_thenUserNotDeleted() {
-		// given
+		// when
 		when(userJpaRepository.findById(1)).thenReturn(Optional.empty());
-		// when, then
-		assertThrows(ResourceNotFoundException.class, () -> userService.deleteUserById(1));
 		// then
+		assertThrows(ResourceNotFoundException.class, () -> userService.deleteUserById(1));
 		verify(userJpaRepository, never()).deleteById(1);
 	}
 
 
 	@Test
-	void getUserById_whenUserFound_thenReturnedUser() {
-		// given
-		when(userJpaRepository.findById(1)).thenReturn(Optional.of(user));
+	void getUserById_whenUserFound_thenUserReturned() {
 		// when
+		when(userJpaRepository.findById(1)).thenReturn(Optional.of(user));
 		UserDto userById = userService.getUserById(1);
 		// then
 		assertThat(userById.getName(), equalTo(userDto.getName()));
@@ -121,17 +107,20 @@ class UserServiceTest {
 	}
 
 	@Test
-	void getUserById_whenUserNotFound_thenThrowException() {
-		// given
+	void getUserById_whenUserNotFound_thenExceptionThrown() {
+		// when
 		doThrow(ResourceNotFoundException.class).when(userJpaRepository).findById(1);
-		// when, then
+		// then
 		assertThrows(ResourceNotFoundException.class, () -> userService.getUserById(1));
 		verify(userJpaRepository).findById(1);
 	}
 
 	@Test
 	void getUsers() {
+		// when
 		userService.getUsers();
+		// then
 		verify(userJpaRepository).findAll();
 	}
+
 }

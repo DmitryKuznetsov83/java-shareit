@@ -36,16 +36,10 @@ class RequestControllerTest {
 
 	@Test
 	@SneakyThrows
-	void postRequest() {
+	void postRequest_whenRequestIsValid_thenRequestPosted() {
 		// given
-		RequestRequestDto requestRequestDto = RequestRequestDto.builder()
-				.description("Item A request")
-				.build();
-
-		RequestResponseDto requestResponseDto = RequestResponseDto.builder()
-				.description("Item A request")
-				.build();
-
+		RequestRequestDto requestRequestDto = RequestRequestDto.builder().description("Item A request").build();
+		RequestResponseDto requestResponseDto = RequestResponseDto.builder().description("Item A request").build();
 		// when
 		when(requestService.addRequest(any(), anyInt())).thenReturn(requestResponseDto);
 
@@ -60,19 +54,16 @@ class RequestControllerTest {
 						status().isOk(),
 						jsonPath("$.description", equalTo("Item A request"))
 				);
-
 	}
 
 	@Test
 	@SneakyThrows
-	void getRequest() {
+	void getRequest_whenRequestFound_thenRequestReturned() {
 		// given
-		RequestResponseDto requestResponseDto = RequestResponseDto.builder()
-				.description("Item A request")
-				.build();
-
-		when(requestService.getRequestById(anyInt(), anyInt())).thenReturn(requestResponseDto);
+		RequestResponseDto requestResponseDto = RequestResponseDto.builder().description("Item A request").build();
 		// when
+		when(requestService.getRequestById(anyInt(), anyInt())).thenReturn(requestResponseDto);
+
 		mvc.perform(get("/requests/1")
 						.accept(MediaType.APPLICATION_JSON)
 						.header("X-Sharer-User-Id", 1))
@@ -87,6 +78,7 @@ class RequestControllerTest {
 	@Test
 	@SneakyThrows
 	void getOwnRequests() {
+		// when
 		mvc.perform(get("/requests")
 						.accept(MediaType.APPLICATION_JSON)
 						.header("X-Sharer-User-Id", 1))
@@ -101,6 +93,7 @@ class RequestControllerTest {
 	@Test
 	@SneakyThrows
 	void getOthersRequests() {
+		// when
 		mvc.perform(get("/requests/all")
 						.accept(MediaType.APPLICATION_JSON)
 						.header("X-Sharer-User-Id", 1))
@@ -114,7 +107,8 @@ class RequestControllerTest {
 
 	@Test
 	@SneakyThrows
-	void getOthersRequests_whenIncorrectPaging() {
+	void getOthersRequests_whenIncorrectPaging_thenStatusIsBadRequest() {
+		// when
 		mvc.perform(get("/requests/all")
 						.accept(MediaType.APPLICATION_JSON)
 						.param("from", "-100")
@@ -126,6 +120,5 @@ class RequestControllerTest {
 						status().isBadRequest()
 				);
 	}
-
 
 }
