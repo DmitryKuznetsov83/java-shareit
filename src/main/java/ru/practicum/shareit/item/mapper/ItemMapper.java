@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.mapper;
 import org.modelmapper.ModelMapper;
 import ru.practicum.shareit.item.dto.item.ItemWithBookingAndCommentsResponseDto;
 import ru.practicum.shareit.item.dto.item.ItemRequestDto;
+import ru.practicum.shareit.item.dto.item.ItemWithBookingResponseDto;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.user.User;
@@ -46,6 +47,10 @@ public class ItemMapper {
 
 	public static List<ItemRequestDto> mapToItemDtoList(List<Item> itemList) {
 		return itemList.stream().map(ItemMapper::mapToItemDto).collect(Collectors.toList());
+	}
+
+	public static ItemWithBookingResponseDto mapToItemWithBookingResponseDto(Item item) {
+		return  modelMapper.map(item, ItemWithBookingResponseDto.class);
 	}
 
 }

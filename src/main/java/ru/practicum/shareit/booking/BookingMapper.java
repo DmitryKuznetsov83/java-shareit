@@ -36,4 +36,5 @@ public class BookingMapper {
 	public static BookingShortResponseDto mapToBookingShortDto(Booking booking) {
 		return modelMapper.map(booking, BookingShortResponseDto.class);
 	}
+
 }

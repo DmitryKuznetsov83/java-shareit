@@ -28,6 +28,7 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -238,6 +239,22 @@ class BookingServiceImplTest {
 		bookingService.getFinishedBookingsByItemAndBooker(item, booker);
 		// then
 		verify(bookingJpaRepository).findAllByItemAndBookerAndStatusAndEndIsLessThanOrderByStartDesc(any(), any(), any(), any());
+	}
+
+	@Test
+	void findAllByItemOwnerId() {
+		// when
+		bookingService.findAllByItemOwnerId(1);
+		// then
+		verify(bookingJpaRepository).findAllByItemOwnerId(any());
+	}
+
+	@Test
+	void findAllByItems() {
+		// when
+		bookingService.findAllByItems(Arrays.asList(item));
+		// then
+		verify(bookingJpaRepository).findAllByItemIn(any());
 	}
 
 }

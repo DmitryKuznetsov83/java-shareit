@@ -25,4 +25,8 @@ public interface BookingService {
 
 	List<Booking> getFinishedBookingsByItemAndBooker(Item item, User booker);
 
+	List<Booking> findAllByItemOwnerId(Integer ownerId);
+
+	List<Booking> findAllByItems(List<Item> itemList);
+
 }

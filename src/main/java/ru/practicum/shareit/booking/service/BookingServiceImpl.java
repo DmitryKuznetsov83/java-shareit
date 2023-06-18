@@ -120,6 +120,16 @@ public class BookingServiceImpl implements BookingService {
 				BookingStatus.APPROVED, LocalDateTime.now());
 	}
 
+	@Override
+	public List<Booking> findAllByItemOwnerId(Integer ownerId) {
+		return bookingJpaRepository.findAllByItemOwnerId(ownerId);
+	}
+
+	@Override
+	public List<Booking> findAllByItems(List<Item> itemList) {
+		return bookingJpaRepository.findAllByItemIn(itemList);
+	}
+
 
 	// PRIVATE
 	private Booking getBookingById(Integer bookingId) {

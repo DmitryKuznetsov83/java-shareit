@@ -22,7 +22,6 @@ import ru.practicum.shareit.item.entity.Comment;
 import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.item.repository.CommentJpaRepository;
 import ru.practicum.shareit.item.repository.ItemJpaRepository;
-import ru.practicum.shareit.item.repository.ItemWithBookingProjection;
 import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.request.service.RequestService;
 import ru.practicum.shareit.user.User;
@@ -62,7 +61,6 @@ class ItemServiceImplTest {
 	private Comment comment;
 	private Booking lastBooking;
 	private Booking nextBooking;
-	private ItemWithBookingProjection itemWithBookingProjection;
 	private CommentRequestDto commentRequestDto;
 
 	@BeforeEach
@@ -131,48 +129,6 @@ class ItemServiceImplTest {
 				.item(item)
 				.booker(requester)
 				.build();
-
-		itemWithBookingProjection = new ItemWithBookingProjection() {
-			@Override
-			public Integer getId() {
-				return null;
-			}
-
-			@Override
-			public String getName() {
-				return "Item A";
-			}
-
-			@Override
-			public String getDescription() {
-				return "Description A";
-			}
-
-			@Override
-			public Boolean getAvailable() {
-				return true;
-			}
-
-			@Override
-			public Integer getLastBookingId() {
-				return null;
-			}
-
-			@Override
-			public Integer getNextBookingId() {
-				return null;
-			}
-
-			@Override
-			public Integer getLastBookingBookerId() {
-				return null;
-			}
-
-			@Override
-			public Integer getNextBookingBookerId() {
-				return null;
-			}
-		};
 
 		commentRequestDto = CommentRequestDto.builder()
 				.text("Comment")
@@ -260,10 +216,9 @@ class ItemServiceImplTest {
 
 	@Test
 	void getItems_whenOwnItemsFoundAndNoPagination_thenListReturned() {
-		// given
-		List<ItemWithBookingProjection> projectionList = Collections.singletonList(itemWithBookingProjection);
 		// when
-		when(itemRepository.findByOwnerWithBookingDto(any(), any())).thenReturn(projectionList);
+		when(itemRepository.findAllByOwnerId(anyInt())).thenReturn(Collections.singletonList(item));
+		when(bookingService.findAllByItemOwnerId(anyInt())).thenReturn(Arrays.asList(lastBooking, nextBooking));
 		List<ItemWithBookingResponseDto> items = itemService.getItems(2, null, null);
 		// then
 		assertThat(items.size(), equalTo(1));
@@ -271,10 +226,9 @@ class ItemServiceImplTest {
 
 	@Test
 	void getItems_whenOwnItemsFoundAndPagination_thenListReturned() {
-		// given
-		List<ItemWithBookingProjection> projectionList = Collections.singletonList(itemWithBookingProjection);
 		// when
-		when(itemRepository.findByOwnerWithBookingDto(any(), any(), any())).thenReturn(new PageImpl<>(projectionList));
+		when(itemRepository.findAllByOwnerId(anyInt(), any())).thenReturn(new PageImpl<>(Collections.singletonList(item)));
+		when(bookingService.findAllByItems(anyList())).thenReturn(Arrays.asList(lastBooking, nextBooking));
 		List<ItemWithBookingResponseDto> items = itemService.getItems(2, 0, 10);
 		// then
 		assertThat(items.size(), equalTo(1));

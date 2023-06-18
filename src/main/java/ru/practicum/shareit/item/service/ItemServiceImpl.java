@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.dto.BookingShortResponseDto;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.ResourceNotFoundException;
 import ru.practicum.shareit.exception.UnauthorizedChangeException;
@@ -24,7 +25,6 @@ import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.repository.CommentJpaRepository;
 import ru.practicum.shareit.item.repository.ItemJpaRepository;
-import ru.practicum.shareit.item.repository.ItemWithBookingProjection;
 import ru.practicum.shareit.request.Request;
 import ru.practicum.shareit.request.service.RequestService;
 import ru.practicum.shareit.user.User;
@@ -33,8 +33,7 @@ import ru.practicum.shareit.utils.DtoManager;
 
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -126,18 +125,42 @@ public class ItemServiceImpl implements ItemService {
 	@Override
 	public List<ItemWithBookingResponseDto> getItems(Integer ownerId, Integer from, Integer size) {
 		User owner = userService.getUserEntityById(ownerId);
-		List<ItemWithBookingProjection> projectionList;
+
+		List<Item> itemList;
+		List<Booking> bookingList;
 		if (from == null) {
-			projectionList = itemRepository.findByOwnerWithBookingDto(ownerId, LocalDateTime.now());
+			itemList = itemRepository.findAllByOwnerId(ownerId);
+			bookingList = bookingService.findAllByItemOwnerId(ownerId);
 		} else {
 			PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("id"));
-			projectionList = itemRepository.findByOwnerWithBookingDto(ownerId, LocalDateTime.now(), pageRequest)
-					.getContent();
+			itemList = itemRepository.findAllByOwnerId(ownerId, pageRequest).getContent();
+			bookingList = bookingService.findAllByItems(itemList);
 		}
-		return projectionList
+
+		Comparator<Booking> bookingComparator = Comparator.comparing(Booking::getStart);
+		LocalDateTime now = LocalDateTime.now();
+
+		Map<Item, List<Booking>> bookingMap = bookingList
 				.stream()
-				.map(ItemWithBookingResponseDto::new)
-				.collect(Collectors.toList());
+				.collect(Collectors.groupingBy(Booking::getItem, Collectors.toCollection(ArrayList::new)));
+
+		List<ItemWithBookingResponseDto> itemsDto = itemList.stream().map(i -> {
+			List<Booking> bookings = bookingMap.getOrDefault(i, Collections.emptyList());
+			Booking lastBooking = bookings.stream().filter(booking -> booking.getStart().isBefore(now)).max(bookingComparator).orElse(null);
+			Booking nextBooking = bookings.stream().filter(booking -> booking.getStart().isAfter(now)).min(bookingComparator).orElse(null);
+
+			ItemWithBookingResponseDto itemWithBookingResponseDto = ItemMapper.mapToItemWithBookingResponseDto(i);
+			BookingShortResponseDto lastBookingShortResponseDto = (lastBooking != null ? BookingMapper.mapToBookingShortDto(lastBooking) : null);
+			BookingShortResponseDto nextBookingShortResponseDto = (nextBooking != null ? BookingMapper.mapToBookingShortDto(nextBooking) : null);
+
+			itemWithBookingResponseDto.setLastBooking(lastBookingShortResponseDto);
+			itemWithBookingResponseDto.setNextBooking(nextBookingShortResponseDto);
+
+			return itemWithBookingResponseDto;
+		}).collect(Collectors.toList());
+
+		return itemsDto;
+
 	}
 
 	@Transactional(readOnly = true)
