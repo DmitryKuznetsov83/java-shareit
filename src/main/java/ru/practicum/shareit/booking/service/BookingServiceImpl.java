@@ -4,6 +4,8 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +33,20 @@ import java.util.List;
 @Slf4j
 public class BookingServiceImpl implements BookingService {
 
-	private final UserService userService;
-	private final ItemService itemService;
 	private final BookingJpaRepository bookingJpaRepository;
+
+	private UserService userService;
+	private ItemService itemService;
+
+	@Autowired
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+
+	@Autowired
+	public void setItemService(ItemService itemService) {
+		this.itemService = itemService;
+	}
 
 	@Transactional
 	@Override
@@ -82,17 +95,41 @@ public class BookingServiceImpl implements BookingService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<BookingResponseDto> getBookersBookings(Integer bookerId, BookingState state) {
+	public List<BookingResponseDto> getBookersBookings(Integer bookerId, BookingState state, Integer from, Integer size) {
 		User booker = userService.getUserEntityById(bookerId);
-		return getBookings(bookerId, state, true);
+		Predicate predicate = getPredicate(bookerId, state, true);
+		return getBookings(predicate, from, size);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<BookingResponseDto> getOwnersBookings(Integer ownerId, BookingState state) {
+	public List<BookingResponseDto> getOwnersBookings(Integer ownerId, BookingState state, Integer from, Integer size) {
 		User owner = userService.getUserEntityById(ownerId);
-		return getBookings(ownerId, state, false);
+		Predicate predicate = getPredicate(ownerId, state, false);
+		return getBookings(predicate, from, size);
 	}
+
+	@Override
+	public List<Booking> getLastAndNextBookingOfItem(Integer itemId) {
+		return bookingJpaRepository.findLastAndNextBooking(itemId, LocalDateTime.now());
+	}
+
+	@Override
+	public List<Booking> getFinishedBookingsByItemAndBooker(Item item, User booker) {
+		return bookingJpaRepository.findAllByItemAndBookerAndStatusAndEndIsLessThanOrderByStartDesc(item, booker,
+				BookingStatus.APPROVED, LocalDateTime.now());
+	}
+
+	@Override
+	public List<Booking> findAllByItemOwnerId(Integer ownerId) {
+		return bookingJpaRepository.findAllByItemOwnerId(ownerId);
+	}
+
+	@Override
+	public List<Booking> findAllByItems(List<Item> itemList) {
+		return bookingJpaRepository.findAllByItemIn(itemList);
+	}
+
 
 	// PRIVATE
 	private Booking getBookingById(Integer bookingId) {
@@ -100,7 +137,7 @@ public class BookingServiceImpl implements BookingService {
 				.orElseThrow(() -> new ResourceNotFoundException("Booking", bookingId));
 	}
 
-	private List<BookingResponseDto> getBookings(Integer userId, BookingState state, boolean booker) {
+	private Predicate getPredicate(Integer userId, BookingState state, boolean booker) {
 
 		LocalDateTime now = LocalDateTime.now();
 		List<Predicate> predicateList = new ArrayList<>();
@@ -131,11 +168,28 @@ public class BookingServiceImpl implements BookingService {
 				break;
 		}
 
-		Predicate totalPredicate = ExpressionUtils.allOf(predicateList);
-		Sort sort = Sort.by(Sort.Direction.DESC, "start");
-		List<Booking> all = (List<Booking>)bookingJpaRepository.findAll(totalPredicate, sort);
-		return BookingMapper.mapToBookingDtoList(all);
+		return ExpressionUtils.allOf(predicateList);
 
+	}
+
+	private List<BookingResponseDto> getBookings(Predicate predicate, Integer from, Integer size) {
+		Sort sort = Sort.by(Sort.Direction.DESC, "start");
+		if (from == null) {
+			return getBookings(predicate, sort);
+		} else {
+			PageRequest pageRequest = PageRequest.of(from / size, size, sort);
+			return getBookings(predicate, pageRequest);
+		}
+	}
+
+	private List<BookingResponseDto> getBookings(Predicate predicate, Sort sort) {
+		List<Booking> bookingList = (List<Booking>)bookingJpaRepository.findAll(predicate, sort);
+		return BookingMapper.mapToBookingDtoList(bookingList);
+	}
+
+	private List<BookingResponseDto> getBookings(Predicate predicate, PageRequest pageRequest) {
+		List<Booking> bookingList = bookingJpaRepository.findAll(predicate, pageRequest).getContent();;
+		return BookingMapper.mapToBookingDtoList(bookingList);
 	}
 
 }

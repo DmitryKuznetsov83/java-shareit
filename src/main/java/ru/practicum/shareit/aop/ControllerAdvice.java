@@ -26,7 +26,7 @@ public class ControllerAdvice {
 
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public ErrorResponse handleRecourseNotFoundException(final ResourceNotFoundException e) {
+	public ErrorResponse handleResourceNotFoundException(final ResourceNotFoundException e) {
 		log.warn("Bad query: {}", e.getMessage());
 		return new ErrorResponse(HttpStatus.NOT_FOUND,"Resource not found", e.getMessage());
 	}

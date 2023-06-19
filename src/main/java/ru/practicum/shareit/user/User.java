@@ -1,8 +1,6 @@
 package ru.practicum.shareit.user;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -11,6 +9,8 @@ import javax.validation.constraints.Email;
 @Table(name = "USERS")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

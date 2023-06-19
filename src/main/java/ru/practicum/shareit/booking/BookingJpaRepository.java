@@ -28,4 +28,8 @@ public interface BookingJpaRepository extends JpaRepository<Booking, Integer>, Q
 	@Query(nativeQuery = true, value = findLastAndNextBookingQuery)
 	List<Booking> findLastAndNextBooking(Integer itemId, LocalDateTime now);
 
+	List<Booking> findAllByItemOwnerId(Integer ownerId);
+
+	List<Booking> findAllByItemIn(List<Item> itemList);
+
 }
