@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class RequestRequestDto {
-	String description;
+	private String description;
 }

@@ -12,7 +12,6 @@ import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.utils.DtoManager;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -32,11 +31,10 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional
 	@Override
-	public UserDto patchUser(Integer userId, Map<String, String> patch) {
+	public UserDto patchUser(Integer userId, UserDto patch) {
 		UserDto userDto = getUserById(userId);
 		UserDto patchedUserDto = DtoManager.patch(userDto, patch);
-		DtoManager.validate(patchedUserDto);
-		User pachedUser = UserMapper.mapToUser(userDto);
+		User pachedUser = UserMapper.mapToUser(patchedUserDto);
 		User savedUser = userJpaRepository.save(pachedUser);
 		log.info("Patch user by id {}", userId);
 		return UserMapper.mapToUserDto(savedUser);

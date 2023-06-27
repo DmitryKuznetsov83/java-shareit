@@ -17,18 +17,4 @@ public class ItemWithBookingResponseDto {
 	private Boolean available;
 	private BookingShortResponseDto lastBooking;
 	private BookingShortResponseDto nextBooking;
-
-//	public ItemWithBookingResponseDto(ItemWithBookingProjection projection) {
-//		this.id = projection.getId();
-//		this.name = projection.getName();
-//		this.description = projection.getDescription();
-//		this.available = projection.getAvailable();
-//		if (projection.getLastBookingId() != null) {
-//			lastBooking = new BookingShortResponseDto(projection.getLastBookingId(), projection.getLastBookingBookerId());
-//		}
-//		if (projection.getNextBookingId() != null) {
-//			nextBooking = new BookingShortResponseDto(projection.getNextBookingId(), projection.getNextBookingBookerId());
-//		}
-//	}
-
 }

@@ -127,22 +127,6 @@ class BookingControllerTest {
 
 	}
 
-//	@Test
-//	@SneakyThrows
-//	void postBooking_whenNoBookerHeader_thenMissingRequestHeaderExceptionThrown() {
-//		// when
-//		mvc.perform(post("/bookings")
-//						.contentType(MediaType.APPLICATION_JSON)
-//						.accept(MediaType.APPLICATION_JSON)
-//						.content(mapper.writeValueAsString(bookingRequestDto)))
-//
-//				// then
-//				.andExpectAll(
-//						status().isBadRequest()
-//				);
-//
-//	}
-
 	@Test
 	@SneakyThrows
 	void approveBooking_whenStatusIsWaiting_thenBookingApproved() {
@@ -220,22 +204,6 @@ class BookingControllerTest {
 						status().isOk()
 				);
 	}
-
-//	@Test
-//	@SneakyThrows
-//	void getBookersBookings_whenStateIsIncorrect_thenStatusIsBadRequest() {
-//		// when
-//		mvc.perform(get("/bookings")
-//						.contentType(MediaType.APPLICATION_JSON)
-//						.accept(MediaType.APPLICATION_JSON)
-//						.param("state", "IncorrectState")
-//						.header("X-Sharer-User-Id", "1"))
-//
-//				// then
-//				.andExpectAll(
-//						status().isBadRequest()
-//				);
-//	}
 
 	@Test
 	@SneakyThrows

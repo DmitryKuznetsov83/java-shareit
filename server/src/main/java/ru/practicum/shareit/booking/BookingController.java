@@ -2,15 +2,10 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.aop.ErrorResponse;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.enums.BookingState;
-import ru.practicum.shareit.booking.exception.IncorrectStatusChangeException;
-import ru.practicum.shareit.booking.exception.ResourceNotAvailableException;
-import ru.practicum.shareit.booking.exception.SelfBookingException;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import java.util.List;
@@ -57,27 +52,6 @@ public class BookingController {
 	                                                  @RequestParam(required = false) Integer size,
 	                                                  @RequestHeader(USER_HEADER) Integer ownerId) {
 		return bookService.getOwnersBookings(ownerId, state, from, size);
-	}
-
-	@ExceptionHandler({ResourceNotAvailableException.class})
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	private ErrorResponse handleItemNotAvailableException(final ResourceNotAvailableException e) {
-		log.warn("Bad query: {}", e.getMessage());
-		return new ErrorResponse(HttpStatus.BAD_REQUEST,"Conflict operation", e.getMessage());
-	}
-
-	@ExceptionHandler({IncorrectStatusChangeException.class})
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	private ErrorResponse handleIncorrectStatusChangeException(final IncorrectStatusChangeException e) {
-		log.warn("Bad query: {}", e.getMessage());
-		return new ErrorResponse(HttpStatus.BAD_REQUEST,"Forbidden operation", e.getMessage());
-	}
-
-	@ExceptionHandler({SelfBookingException.class})
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	private ErrorResponse handleSelfBookingException(final SelfBookingException e) {
-		log.warn("Bad query: {}", e.getMessage());
-		return new ErrorResponse(HttpStatus.NOT_FOUND, "Forbidden operation", e.getMessage());
 	}
 
 }

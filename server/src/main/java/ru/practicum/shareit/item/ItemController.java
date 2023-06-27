@@ -11,7 +11,6 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/items")
@@ -28,7 +27,7 @@ public class ItemController {
 
 	@PatchMapping("/{itemId}")
 	public ItemRequestDto patchItem(@PathVariable Integer itemId,
-	                                @RequestBody Map<String, String> patch,
+	                                @RequestBody ItemRequestDto patch,
 	                                @RequestHeader(USER_HEADER) Integer userId) {
 		return itemService.patchItem(itemId, userId, patch);
 	}

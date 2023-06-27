@@ -4,13 +4,12 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
-import java.util.Map;
 
 public interface UserService {
 
 	UserDto addUser(UserDto user);
 
-	UserDto patchUser(Integer userId, Map<String, String> patch);
+	UserDto patchUser(Integer userId, UserDto patch);
 
 	void deleteUserById(int userId);
 

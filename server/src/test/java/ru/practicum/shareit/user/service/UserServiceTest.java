@@ -12,8 +12,6 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserJpaRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -64,8 +62,7 @@ class UserServiceTest {
 	@Test
 	void patchUser_whenCorrectPatch_thenUserIsPatched() {
 		// given
-		Map<String, String> patch = new HashMap<>();
-		patch.put("name", "patched name");
+		UserDto patch = UserDto.builder().name("patched name").build();
 		// when
 		when(userJpaRepository.findById(any())).thenReturn(Optional.ofNullable(user));
 		when(userJpaRepository.save(any())).then(returnsFirstArg());

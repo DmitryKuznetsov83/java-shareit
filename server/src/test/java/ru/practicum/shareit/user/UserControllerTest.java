@@ -12,9 +12,7 @@ import ru.practicum.shareit.exception.ResourceNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -62,32 +60,11 @@ class UserControllerTest {
 
 	}
 
-//	@Test
-//	@SneakyThrows
-//	void postUser_whenBadEmail_thenStatusIsBadRequest() {
-//		// given
-//		UserDto requestDto = UserDto.builder()
-//				.name("User A")
-//				.email("bad_mail.org")
-//				.build();
-//
-//		// when
-//		mvc.perform(post("/users")
-//						.contentType(MediaType.APPLICATION_JSON)
-//						.accept(MediaType.APPLICATION_JSON)
-//						.content(mapper.writeValueAsString(requestDto)))
-//
-//				// then
-//				.andExpect(status().isBadRequest());
-//
-//	}
-
 	@Test
 	@SneakyThrows
 	void patchUser_whenPatchNotHasId_ThenUserPatched() {
 		// given
-		Map<String, String> patch = new HashMap<>();
-		patch.put("name", "updated User A");
+		UserDto patch = UserDto.builder().name("updated User A").build();
 		UserDto patchedUserDto = UserDto.builder().name("updated User A").email("user_a@mail.org").build();
 
 		// when
@@ -104,23 +81,6 @@ class UserControllerTest {
 						jsonPath("$.email", equalTo("user_a@mail.org"))
 				);
 	}
-
-//	@Test
-//	@SneakyThrows
-//	void patchUser_whenPatchHasId_thenStatusIsBadRequest() {
-//		// given
-//		Map<String, String> patch = new HashMap<>();
-//		patch.put("id", "100");
-//
-//		// when
-//		mvc.perform(patch("/users/1")
-//						.contentType(MediaType.APPLICATION_JSON)
-//						.accept(MediaType.APPLICATION_JSON)
-//						.content(mapper.writeValueAsString(patch)))
-//
-//				// then
-//				.andExpect(status().isBadRequest());
-//	}
 
 	@Test
 	@SneakyThrows

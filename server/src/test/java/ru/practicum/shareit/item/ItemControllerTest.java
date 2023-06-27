@@ -71,8 +71,7 @@ class ItemControllerTest {
 	@SneakyThrows
 	void patchItem_whenUserIsOwner_thenPatchedItemReturned() {
 		// given
-		Map<String, String> patch = new HashMap<>();
-		patch.put("name", "updated Item A");
+		ItemRequestDto patch = ItemRequestDto.builder().name("updated Item A").build();
 		ItemRequestDto patchedItemDto = ItemRequestDto.builder()
 				.name("updated Item A")
 				.description("")

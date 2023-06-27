@@ -10,14 +10,13 @@ import ru.practicum.shareit.item.entity.Item;
 import ru.practicum.shareit.request.Request;
 
 import java.util.List;
-import java.util.Map;
 
 
 public interface ItemService {
 
 	ItemRequestDto addItem(ItemRequestDto itemRequestDto, Integer ownerId);
 
-	ItemRequestDto patchItem(Integer itemId, Integer userId, Map<String, String> patch);
+	ItemRequestDto patchItem(Integer itemId, Integer userId, ItemRequestDto patch);
 
 	ItemWithBookingAndCommentsResponseDto getItemById(int itemId, int userId);
 

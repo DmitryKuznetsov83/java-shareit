@@ -162,8 +162,7 @@ class ItemServiceImplTest {
 	@Test
 	void patchItem_whenUserIsOwner_thenPatchedItemReturned() {
 		// given
-		Map<String, String> patch = new HashMap<>();
-		patch.put("name", "patched name");
+		ItemRequestDto patch = ItemRequestDto.builder().name("patched name").build();
 		// when
 		when(itemRepository.findById(any())).thenReturn(Optional.of(item));
 		when(userService.getUserEntityById(anyInt())).thenReturn(owner);
@@ -171,7 +170,7 @@ class ItemServiceImplTest {
 		when(itemRepository.save(any())).then(returnsFirstArg());
 		ItemRequestDto patchedItemRequest = itemService.patchItem(1, 1, patch);
 		// then
-		assertThat(patchedItemRequest.getName(), equalTo(patch.get("name")));
+		assertThat(patchedItemRequest.getName(), equalTo(patch.getName()));
 		assertThat(patchedItemRequest.getDescription(), equalTo(item.getDescription()));
 		verify(itemRepository).save(any());
 	}

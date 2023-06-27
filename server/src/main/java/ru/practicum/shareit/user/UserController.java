@@ -6,7 +6,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -21,7 +20,7 @@ public class UserController {
 	}
 
 	@PatchMapping("/{userId}")
-	public UserDto patchUser(@PathVariable Integer userId, @RequestBody Map<String, String> patch) {
+	public UserDto patchUser(@PathVariable Integer userId, @RequestBody UserDto patch) {
 		return userService.patchUser(userId, patch);
 	}
 

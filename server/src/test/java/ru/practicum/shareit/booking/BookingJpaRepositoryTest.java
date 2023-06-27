@@ -49,10 +49,6 @@ class BookingJpaRepositoryTest {
 		nbEnd = LocalDateTime.now().plusDays(10);
 		anbStart = LocalDateTime.now().plusDays(19);
 		anbEnd = LocalDateTime.now().plusDays(20);
-
-		//lastBooking = Booking.builder().start(lbStart).end(lbEnd).item(item).booker(booker).status(BookingStatus.APPROVED).build();
-		//nextBooking = Booking.builder().start(nbStart).end(nbEnd).item(item).booker(booker).status(BookingStatus.APPROVED).build();
-		//afterNextBooking = Booking.builder().start(anbStart).end(anbEnd).item(item).booker(booker).status(BookingStatus.APPROVED).build();
 	}
 
 	@Test

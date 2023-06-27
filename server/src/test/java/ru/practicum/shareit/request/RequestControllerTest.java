@@ -105,20 +105,4 @@ class RequestControllerTest {
 				);
 	}
 
-//	@Test
-//	@SneakyThrows
-//	void getOthersRequests_whenIncorrectPaging_thenStatusIsBadRequest() {
-//		// when
-//		mvc.perform(get("/requests/all")
-//						.accept(MediaType.APPLICATION_JSON)
-//						.param("from", "-100")
-//						.param("size", "10")
-//						.header("X-Sharer-User-Id", 1))
-//
-//				// then
-//				.andExpectAll(
-//						status().isBadRequest()
-//				);
-//	}
-
 }

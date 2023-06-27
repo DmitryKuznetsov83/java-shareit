@@ -15,8 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class RequestResponseDto {
-	Integer id;
-	String description;
-	LocalDateTime created;
-	List<ItemRequestDto> items;
+	private Integer id;
+	private String description;
+	private LocalDateTime created;
+	private List<ItemRequestDto> items;
 }

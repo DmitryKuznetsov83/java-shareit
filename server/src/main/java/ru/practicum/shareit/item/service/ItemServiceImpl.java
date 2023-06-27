@@ -61,7 +61,7 @@ public class ItemServiceImpl implements ItemService {
 
 	@Transactional
 	@Override
-	public ItemRequestDto patchItem(Integer itemId, Integer userId, Map<String, String> patch) {
+	public ItemRequestDto patchItem(Integer itemId, Integer userId, ItemRequestDto patch) {
 		Item item = getItemEntityById(itemId);
 		User user = userService.getUserEntityById(userId);
 		if (!item.getOwner().equals(user)) {
@@ -69,7 +69,6 @@ public class ItemServiceImpl implements ItemService {
 		}
 		ItemRequestDto itemRequestDto = ItemMapper.mapToItemDto(item);
 		ItemRequestDto patchedItemDto = DtoManager.patch(itemRequestDto, patch);
-		DtoManager.validate(patchedItemDto);
 		Request request = getRequestFromItemDto(patchedItemDto);
 		Item pachedItem = ItemMapper.mapToItem(patchedItemDto, user, request);
 		Item savedItem = itemRepository.save(pachedItem);
